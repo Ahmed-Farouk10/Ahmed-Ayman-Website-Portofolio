@@ -1,0 +1,22 @@
+{
+  "name": "ahmed-ayman-website-portofolio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  },
+  "dependencies": {
+    "@sanity/image-url": "^1.2.0",
+    "bootstrap": "^5.3.8",
+    "lucide-react": "^0.552.0",
+    "next-sanity": "^11.6.3"
+  }
+}
