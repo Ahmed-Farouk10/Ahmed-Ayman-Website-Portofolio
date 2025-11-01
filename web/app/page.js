@@ -1,6 +1,6 @@
 // web/app/page.js
-import { client, urlFor } from '@/sanity/client'
 import Image from 'next/image'
+import { client, urlFor } from '../sanity/client'
 
 // GROQ Queries
 const PROJECTS_QUERY = `*[_type == "project"]{
@@ -122,15 +122,19 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map(project => (
               <div key={project._id} className="bg-slate-800 rounded-xl overflow-hidden shadow-lg">
-                {project.mainImage && (
-                  <Image
-                    src={urlFor(project.mainImage).width(600).height(400).url()}
-                    alt={project.title}
-                    width={600}
-                    height={400}
-                    className="w-full h-48 object-cover"
-                  />
-                )}
+                {project.mainImage ? (
+  <Image
+    src={urlFor(project.mainImage)}
+    alt={project.title}
+    width={600}
+    height={400}
+    className="w-full h-48 object-cover"
+  />
+) : (
+  <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-500">
+    No image
+  </div>
+)}
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-white">{project.title}</h3>
                   <p className="mt-2 text-gray-300">{project.description}</p>
