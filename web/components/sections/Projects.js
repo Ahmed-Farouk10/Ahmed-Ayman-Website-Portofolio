@@ -2,24 +2,18 @@
 
 import Image from 'next/image'
 import { urlFor } from '@/sanity/client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useReveal } from '@/hooks/use-reveal'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { ExternalLink, Github } from 'lucide-react'
+import { ExternalLink, Github, X } from 'lucide-react'
 
 // --- This is the ProjectCard component that is actually being used ---
 function ProjectCard({ project }) {
   const { title, description, mainImage, skills, demoLink, githubLink, webUrl } = project;
   const [isOpen, setIsOpen] = useState(false)
-  const triggerRef = useRef(null)
+  
+  const toggleModal = () => {
+    setIsOpen(!isOpen)
+  }
   
   const imgUrl = mainImage ? urlFor(mainImage)?.width(600).height(400).url() : null
   
@@ -31,39 +25,7 @@ function ProjectCard({ project }) {
   
   const hasLongDescription = description && description.length > maxLength
 
-  useEffect(() => {
-    if (isOpen) {
-      // Prevent body scroll when dialog is open
-      const originalOverflow = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-      document.body.setAttribute('data-dialog-open', 'true')
-      
-      // Dynamic scroll to position modal lower in viewport - works on both mobile and desktop
-      if (triggerRef.current) {
-        setTimeout(() => {
-          const rect = triggerRef.current.getBoundingClientRect()
-          const absoluteTop = window.scrollY + rect.top
-          const viewportHeight = window.innerHeight
-          const isMobile = window.innerWidth < 768
-          
-          // Mobile: scroll more (70% down), Desktop: scroll less (60% down)
-          const scrollRatio = isMobile ? 0.7 : 0.6
-          const targetScroll = Math.max(absoluteTop - viewportHeight * scrollRatio, 0)
-          
-          window.scrollTo({ 
-            top: targetScroll, 
-            behavior: 'smooth' 
-          })
-        }, 100)
-      }
-      
-      return () => {
-        // Restore body scroll when dialog closes
-        document.body.style.overflow = originalOverflow
-        document.body.removeAttribute('data-dialog-open')
-      }
-    }
-  }, [isOpen])
+  // Removed scroll lock - users can now scroll while modal is open
 
   return (
     <>
@@ -97,100 +59,109 @@ function ProjectCard({ project }) {
           
           <div className="flex flex-col gap-2 mt-auto">
             {hasLongDescription && (
-              <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogTrigger asChild>
-                  <button
-                    ref={triggerRef}
-                    className="w-full text-center bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium py-2.5 px-4 rounded-lg transition-colors duration-300 border border-blue-500/30"
+              <>
+                {/* Trigger Button */}
+                <button
+                  onClick={toggleModal}
+                  className="w-full text-center bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium py-2.5 px-4 rounded-lg transition-colors duration-300 border border-blue-500/30"
+                >
+                  Read More
+                </button>
+
+                {/* Modal Overlay */}
+                {isOpen && (
+                  <div 
+                    onClick={toggleModal}
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 p-4"
                   >
-                    Read More
-                  </button>
-                </DialogTrigger>
-                
-                <DialogContent
-                  className="translate-y-[calc(-50%+1500px)] sm:translate-y-[calc(-50%+120px)] md:translate-y-[calc(-50%+1350px)] w-[95vw] max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] max-h-[85vh] sm:max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl sm:rounded-2xl shadow-2xl"
-                >  
-                  {/*//Decide the breakpoint you care about (for laptop/desktop tweak lg or xl).
-                   Increase the pixel amount to push the dialog lower; decrease to raise it.
-                    Example: want it much lower on desktop? change lg:translate-y-[calc(-50%+120px)] to lg:translate-y-[calc(-50%+200px)].
-                     On mobile, adjust the first value (no prefix) or the sm: value.*/}
-                     
-                  {/* Row 1: Header (fixed) */}
-                  <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700">
-                    <DialogTitle className="text-xl sm:text-2xl font-bold text-white">{title}</DialogTitle>
-                  </DialogHeader>
-                  
-                  {/* Row 2: Content (scrollable) */}
-                  <div className="overflow-y-auto px-4 sm:px-6 py-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                    <DialogDescription className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                      {description} {/* <-- Use the raw description string */}
-                    </DialogDescription>
+                    {/* Modal Content */}
+                    <div 
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border border-slate-700 flex flex-col transform transition-all duration-300 scale-100 opacity-100"
+                    >
+                    {/* Header - Fixed */}
+                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
+                      <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
+                      <button
+                        onClick={toggleModal}
+                        className="text-slate-400 hover:text-white transition-colors p-1 rounded-sm hover:bg-slate-700"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
                     
-                    {imgUrl && (
-                      <div className="my-4 rounded-lg overflow-hidden border border-slate-700">
-                        <Image
-                          src={urlFor(mainImage)?.width(800).height(450).url()}
-                          alt={title || 'Project Image'}
-                          width={800}
-                          height={450}
-                          className="w-full h-auto object-cover"
-                        />
-                      </div>
-                    )}
-                    
-                    {skills && skills.length > 0 && (
-                      <div className="my-4">
-                        <h4 className="text-white font-semibold mb-3">Skills Used</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {skills.map((skill) => (
-                            <span key={skill} className="bg-blue-900/40 text-blue-200 py-1 px-3 rounded-full text-xs font-medium">
-                              {skill}
-                            </span>
-                          ))}
+                    {/* Content (scrollable) - Takes remaining space */}
+                    <div className="overflow-y-auto px-4 sm:px-6 py-4 flex-1 min-h-0" style={{ WebkitOverflowScrolling: 'touch', maxHeight: 'calc(90vh - 200px)' }}>
+                      <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
+                        {description}
+                      </p>
+                      
+                      {imgUrl && (
+                        <div className="my-4 rounded-lg overflow-hidden border border-slate-700">
+                          <Image
+                            src={urlFor(mainImage)?.width(800).height(450).url()}
+                            alt={title || 'Project Image'}
+                            width={800}
+                            height={450}
+                            className="w-full h-auto object-cover"
+                          />
                         </div>
-                      </div>
-                    )}
+                      )}
+                      
+                      {skills && skills.length > 0 && (
+                        <div className="my-4">
+                          <h4 className="text-white font-semibold mb-3">Skills Used</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {skills.map((skill) => (
+                              <span key={skill} className="bg-blue-900/40 text-blue-200 py-1 px-3 rounded-full text-xs font-medium">
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Footer - Fixed */}
+                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex flex-col sm:flex-row flex-shrink-0">
+                      {webUrl && (
+                        <a
+                          href={webUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span className="text-sm sm:text-base">Visit Website</span>
+                        </a>
+                      )}
+                      {demoLink && (
+                        <a
+                          href={demoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span className="text-sm sm:text-base">Live Demo</span>
+                        </a>
+                      )}
+                      {githubLink && (
+                        <a
+                          href={githubLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 min-h-[44px] sm:min-h-0"
+                        >
+                          <Github className="w-4 h-4" />
+                          <span className="text-sm sm:text-base">View Code</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  
-                  {/* Row 3: Footer (fixed) */}
-                  <DialogFooter className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex-col sm:flex-row">
-                    {webUrl && (
-                      <a
-                        href={webUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        <span className="text-sm sm:text-base">Visit Website</span>
-                      </a>
-                    )}
-                    {demoLink && (
-                      <a
-                        href={demoLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        <span className="text-sm sm:text-base">Live Demo</span>
-                      </a>
-                    )}
-                    {githubLink && (
-                      <a
-                        href={githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 min-h-[44px] sm:min-h-0"
-                      >
-                        <Github className="w-4 h-4" />
-                        <span className="text-sm sm:text-base">View Code</span>
-                      </a>
-                    )}
-                  </DialogFooter>
-                </DialogContent>
-                
-              </Dialog>
+                </div>
+                )}
+              </>
             )}
             
             {webUrl && (
