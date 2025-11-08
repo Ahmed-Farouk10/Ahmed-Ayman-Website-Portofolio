@@ -12,8 +12,31 @@ function ProjectCard({ project }) {
   const [isOpen, setIsOpen] = useState(false)
   
   const toggleModal = () => {
-    setIsOpen(!isOpen)
+    const newState = !isOpen
+    setIsOpen(newState)
+    
+    // On desktop, scroll to top when opening modal to prevent blur and ensure close button works
+    if (newState && typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 768 // md breakpoint
+      if (!isMobile) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }
   }
+  
+  // Auto-close modal after 10 seconds on mobile
+  useEffect(() => {
+    if (isOpen && typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 768 // md breakpoint
+      if (isMobile) {
+        const timer = setTimeout(() => {
+          setIsOpen(false)
+        }, 10000) // 10 seconds
+        
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [isOpen])
   
   const imgUrl = mainImage ? urlFor(mainImage)?.width(600).height(400).url() : null
   
