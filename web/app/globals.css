@@ -242,7 +242,7 @@
   filter: brightness(1.05);
 }
 
-/* Mobile dialog fixes - Safari & Chrome compatibility */
+/* Mobile dialog fixes */
 @media (max-width: 640px) {
   /* Prevent body scroll when dialog is open on mobile */
   body[data-dialog-open="true"] {
@@ -250,21 +250,6 @@
     position: fixed;
     width: 100%;
   }
-  
-  /* Fix for Safari viewport height issues */
-  @supports (-webkit-touch-callout: none) {
-    .modal-content {
-      max-height: -webkit-fill-available;
-    }
-  }
-}
-
-/* Safari & Chrome scroll fix */
-.modal-scroll {
-  -webkit-overflow-scrolling: touch;
-  overflow-y: auto;
-  transform: translateZ(0);
-  will-change: scroll-position;
 }
 
 /* Mobile Safari/Chrome viewport fixes */

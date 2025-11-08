@@ -25,6 +25,24 @@ function ProjectCard({ project }) {
   
   const hasLongDescription = description && description.length > maxLength
 
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden'
+      document.body.setAttribute('data-dialog-open', 'true')
+    } else {
+      // Restore body scroll when modal closes
+      document.body.style.overflow = ''
+      document.body.removeAttribute('data-dialog-open')
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      document.body.style.overflow = ''
+      document.body.removeAttribute('data-dialog-open')
+    }
+  }, [isOpen])
+
   return (
     <>
       <div className="bg-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col transform transition-all duration-300 hover:scale-105 hover:shadow-blue-500/20">
@@ -67,84 +85,64 @@ function ProjectCard({ project }) {
                 </button>
 
                 {/* Modal Overlay */}
-                {isOpen && (
+                <div 
+                  onClick={toggleModal}
+                  className={`fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ${
+                    isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  }`}
+                >
+                  {/* Modal Content */}
                   <div 
-                    onClick={toggleModal}
-                    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
-                    style={{
-                      WebkitBackdropFilter: 'blur(12px)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitOverflowScrolling: 'touch',
-                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full max-h-[85vh] sm:max-h-[90vh] border border-slate-700 grid grid-rows-[auto_1fr_auto] transform transition-all duration-300 ${
+                      isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                    }`}
                   >
-                    {/* Modal Content */}
-                    <div 
-                      onClick={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full border-2 border-slate-600 flex flex-col relative"
-                      style={{
-                        maxHeight: 'calc(100vh - 2rem)',
-                        height: 'auto',
-                        WebkitOverflowScrolling: 'touch',
-                      }}
-                    >
-                    {/* Close Button - Top Right Corner */}
-                    <button
-                      onClick={toggleModal}
-                      className="absolute top-4 right-4 z-10 bg-slate-700/90 hover:bg-slate-600 active:bg-slate-500 text-white rounded-full p-2.5 sm:p-2 shadow-lg hover:shadow-xl transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center group"
-                      aria-label="Close modal"
-                    >
-                      <X className="w-6 h-6 sm:w-5 sm:h-5 group-hover:rotate-90 transition-transform duration-200" />
-                    </button>
-
-                    {/* Header - Fixed */}
-                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-start flex-shrink-0 pr-16">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white break-words">{title}</h2>
+                    {/* Header */}
+                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between">
+                      <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
+                      <button
+                        onClick={toggleModal}
+                        className="text-slate-400 hover:text-white transition-colors p-1 rounded-sm hover:bg-slate-700"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
                     
-                    {/* Content (scrollable) - Takes remaining space */}
-                    <div 
-                      className="flex-1 overflow-y-auto px-4 sm:px-6 py-4" 
-                      style={{ 
-                        WebkitOverflowScrolling: 'touch',
-                        minHeight: 0,
-                      }}
-                    >
-                      <div className="space-y-6">
-                        <div>
-                          <p className="text-slate-300 leading-relaxed whitespace-pre-wrap break-words">
-                            {description}
-                          </p>
+                    {/* Content (scrollable) */}
+                    <div className="overflow-y-auto px-4 sm:px-6 py-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+                      <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
+                        {description}
+                      </p>
+                      
+                      {imgUrl && (
+                        <div className="my-4 rounded-lg overflow-hidden border border-slate-700">
+                          <Image
+                            src={urlFor(mainImage)?.width(800).height(450).url()}
+                            alt={title || 'Project Image'}
+                            width={800}
+                            height={450}
+                            className="w-full h-auto object-cover"
+                          />
                         </div>
-                        
-                        {imgUrl && (
-                          <div className="rounded-lg overflow-hidden border border-slate-700">
-                            <Image
-                              src={urlFor(mainImage)?.width(800).height(450).url()}
-                              alt={title || 'Project Image'}
-                              width={800}
-                              height={450}
-                              className="w-full h-auto object-cover"
-                            />
+                      )}
+                      
+                      {skills && skills.length > 0 && (
+                        <div className="my-4">
+                          <h4 className="text-white font-semibold mb-3">Skills Used</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {skills.map((skill) => (
+                              <span key={skill} className="bg-blue-900/40 text-blue-200 py-1 px-3 rounded-full text-xs font-medium">
+                                {skill}
+                              </span>
+                            ))}
                           </div>
-                        )}
-                        
-                        {skills && skills.length > 0 && (
-                          <div>
-                            <h4 className="text-white font-semibold mb-3">Skills Used</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {skills.map((skill) => (
-                                <span key={skill} className="bg-blue-900/40 text-blue-200 py-1.5 px-3 rounded-full text-xs font-medium whitespace-nowrap inline-block">
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Footer - Fixed */}
-                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex flex-col sm:flex-row flex-shrink-0 mt-auto">
+                    {/* Footer */}
+                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex flex-col sm:flex-row">
                       {webUrl && (
                         <a
                           href={webUrl}
@@ -181,7 +179,6 @@ function ProjectCard({ project }) {
                     </div>
                   </div>
                 </div>
-                )}
               </>
             )}
             
