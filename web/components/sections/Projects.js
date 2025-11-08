@@ -82,12 +82,13 @@ function ProjectCard({ project }) {
                   >
                     {/* Header */}
                     <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white pr-2">{title}</h2>
                       <button
                         onClick={toggleModal}
-                        className="text-slate-400 hover:text-white transition-colors p-1 rounded-sm hover:bg-slate-700"
+                        className="text-slate-400 hover:text-white active:text-white transition-colors p-3 sm:p-2 rounded-lg hover:bg-slate-700 active:bg-slate-600 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center touch-manipulation"
+                        aria-label="Close modal"
                       >
-                        <X className="w-5 h-5" />
+                        <X className="w-6 h-6 sm:w-5 sm:h-5" />
                       </button>
                     </div>
                     
