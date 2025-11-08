@@ -12,16 +12,7 @@ function ProjectCard({ project }) {
   const [isOpen, setIsOpen] = useState(false)
   
   const toggleModal = () => {
-    const newState = !isOpen
-    setIsOpen(newState)
-    
-    // On desktop, scroll to top when opening modal to prevent blur and ensure close button works
-    if (newState && typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 768 // md breakpoint
-      if (!isMobile) {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-    }
+    setIsOpen(!isOpen)
   }
   
   // Auto-close modal after 10 seconds on mobile
