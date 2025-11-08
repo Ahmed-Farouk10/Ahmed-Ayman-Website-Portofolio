@@ -38,22 +38,20 @@ function ProjectCard({ project }) {
       document.body.style.overflow = 'hidden'
       document.body.setAttribute('data-dialog-open', 'true')
       
-      // Only auto-scroll on mobile devices
-      const isMobile = window.innerWidth < 768
-      if (isMobile && triggerRef.current) {
-        // Small delay to ensure dialog is mounted
+      // Dynamic scroll to position modal lower in viewport - works on both mobile and desktop
+      if (triggerRef.current) {
         setTimeout(() => {
           const rect = triggerRef.current.getBoundingClientRect()
           const absoluteTop = window.scrollY + rect.top
           const viewportHeight = window.innerHeight
-          const targetScroll = Math.max(absoluteTop - viewportHeight * 0.15, 0)
+          // Position button lower in viewport (60% down) so modal appears in lower portion
+          const targetScroll = Math.max(absoluteTop - viewportHeight * 0.6, 0)
           
-          // Smooth scroll on mobile
           window.scrollTo({ 
             top: targetScroll, 
             behavior: 'smooth' 
           })
-        }, 150)
+        }, 100)
       }
       
       return () => {
@@ -107,7 +105,7 @@ function ProjectCard({ project }) {
                 </DialogTrigger>
                 
                 <DialogContent
-                  className="w-[95vw] max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] max-h-[85vh] sm:max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl sm:rounded-2xl shadow-2xl"
+                  className="translate-y-[calc(-50%+150px)] sm:translate-y-[calc(-50%+120px)] md:translate-y-[calc(-50%+1350px)] w-[95vw] max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] max-h-[85vh] sm:max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl sm:rounded-2xl shadow-2xl"
                 >  
                   {/*//Decide the breakpoint you care about (for laptop/desktop tweak lg or xl).
                    Increase the pixel amount to push the dialog lower; decrease to raise it.
