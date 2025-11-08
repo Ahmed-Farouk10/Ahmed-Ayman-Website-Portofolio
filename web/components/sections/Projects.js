@@ -32,11 +32,33 @@ function ProjectCard({ project }) {
   const hasLongDescription = description && description.length > maxLength
 
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect()
-      const absoluteTop = window.scrollY + rect.top
-      const targetScroll = Math.max(absoluteTop - window.innerHeight * 0.25, 0)
-      window.scrollTo({ top: targetScroll, behavior: 'smooth' })
+    if (isOpen) {
+      // Prevent body scroll on mobile when dialog is open
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      document.body.setAttribute('data-dialog-open', 'true')
+      
+      if (triggerRef.current) {
+        // Small delay to ensure dialog is mounted
+        setTimeout(() => {
+          const rect = triggerRef.current.getBoundingClientRect()
+          const absoluteTop = window.scrollY + rect.top
+          const viewportHeight = window.innerHeight
+          const targetScroll = Math.max(absoluteTop - viewportHeight * 0.15, 0)
+          
+          // Smooth scroll on mobile
+          window.scrollTo({ 
+            top: targetScroll, 
+            behavior: 'smooth' 
+          })
+        }, 150)
+      }
+      
+      return () => {
+        // Restore body scroll when dialog closes
+        document.body.style.overflow = originalOverflow
+        document.body.removeAttribute('data-dialog-open')
+      }
     }
   }, [isOpen])
 
@@ -82,9 +104,13 @@ function ProjectCard({ project }) {
                   </button>
                 </DialogTrigger>
                 
-                {/* --- FIX IS HERE --- */}
                 <DialogContent
-                  className="translate-y-[calc(-50%+240px)] sm:translate-y-[calc(-50%+200px)] md:translate-y-[calc(-50%+160px)] lg:translate-y-[calc(-50%+120px)] xl:translate-y-[calc(-50%+1700px)] max-w-none w-[min(95vw,860px)] sm:w-[min(95vw,860px)] max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl shadow-2xl"
+                  className="!fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[95vw] max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] max-h-[85vh] sm:max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl sm:rounded-2xl shadow-2xl mx-4 sm:mx-0"
+                  style={{
+                    // Mobile Safari/Chrome fix
+                    WebkitTransform: 'translate(-50%, -50%)',
+                    transform: 'translate(-50%, -50%)',
+                  }}
                 >  
                   {/*//Decide the breakpoint you care about (for laptop/desktop tweak lg or xl).
                    Increase the pixel amount to push the dialog lower; decrease to raise it.
@@ -92,12 +118,12 @@ function ProjectCard({ project }) {
                      On mobile, adjust the first value (no prefix) or the sm: value.*/}
                      
                   {/* Row 1: Header (fixed) */}
-                  <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-700">
-                    <DialogTitle className="text-2xl font-bold text-white">{title}</DialogTitle>
+                  <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700">
+                    <DialogTitle className="text-xl sm:text-2xl font-bold text-white">{title}</DialogTitle>
                   </DialogHeader>
                   
                   {/* Row 2: Content (scrollable) */}
-                  <div className="overflow-y-auto px-6 py-4">
+                  <div className="overflow-y-auto px-4 sm:px-6 py-4" style={{ WebkitOverflowScrolling: 'touch' }}>
                     <DialogDescription className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
                       {description} {/* <-- Use the raw description string */}
                     </DialogDescription>
@@ -129,16 +155,16 @@ function ProjectCard({ project }) {
                   </div>
                   
                   {/* Row 3: Footer (fixed) */}
-                  <DialogFooter className="px-6 pb-6 pt-4 border-t border-slate-700 gap-3 sm:gap-4 w-full">
+                  <DialogFooter className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex-col sm:flex-row">
                     {webUrl && (
                       <a
                         href={webUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20"
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        Visit Website
+                        <span className="text-sm sm:text-base">Visit Website</span>
                       </a>
                     )}
                     {demoLink && (
@@ -146,10 +172,10 @@ function ProjectCard({ project }) {
                         href={demoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20"
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        Live Demo
+                        <span className="text-sm sm:text-base">Live Demo</span>
                       </a>
                     )}
                     {githubLink && (
@@ -157,10 +183,10 @@ function ProjectCard({ project }) {
                         href={githubLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-300"
+                        className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 min-h-[44px] sm:min-h-0"
                       >
                         <Github className="w-4 h-4" />
-                        View Code
+                        <span className="text-sm sm:text-base">View Code</span>
                       </a>
                     )}
                   </DialogFooter>
@@ -174,7 +200,7 @@ function ProjectCard({ project }) {
                 href={webUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                className="w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 min-h-[44px] flex items-center justify-center"
               >
                 Visit Website
               </a>
@@ -184,7 +210,7 @@ function ProjectCard({ project }) {
                 href={demoLink} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 min-h-[44px] flex items-center justify-center"
               >
                 Live Demo
               </a>
@@ -194,7 +220,7 @@ function ProjectCard({ project }) {
                 href={githubLink} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-full text-center bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300"
+                className="w-full text-center bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 min-h-[44px] flex items-center justify-center"
               >
                 View Code
               </a>

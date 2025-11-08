@@ -240,6 +240,25 @@
   filter: brightness(1.05);
 }
 
+/* Mobile dialog fixes */
+@media (max-width: 640px) {
+  /* Prevent body scroll when dialog is open on mobile */
+  body[data-dialog-open="true"] {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* Mobile Safari/Chrome viewport fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Safari specific */
+  .dialog-content-mobile {
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+}
+
 /* Scroll-reveal helper classes */
 .reveal {
   opacity: 0;
