@@ -70,30 +70,25 @@ function ProjectCard({ project }) {
                 {isOpen && (
                   <div 
                     onClick={toggleModal}
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
                   >
                     {/* Modal Content */}
                     <div 
                       onClick={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border border-slate-700 flex flex-col"
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border-2 border-slate-600 flex flex-col relative"
                     >
+                    {/* Close Button - Top Right Corner */}
+                    <button
+                      onClick={toggleModal}
+                      className="absolute top-4 right-4 z-10 bg-slate-700/90 hover:bg-slate-600 active:bg-slate-500 text-white rounded-full p-2.5 sm:p-2 shadow-lg hover:shadow-xl transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center group"
+                      aria-label="Close modal"
+                    >
+                      <X className="w-6 h-6 sm:w-5 sm:h-5 group-hover:rotate-90 transition-transform duration-200" />
+                    </button>
+
                     {/* Header - Fixed */}
-                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0 gap-2">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white flex-1 pr-2">{title}</h2>
-                      {/* Mobile: Text button, Desktop: X icon */}
-                      <button
-                        onClick={toggleModal}
-                        className="sm:hidden text-blue-400 hover:text-blue-300 active:text-blue-200 font-medium px-4 py-2 rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 min-h-[44px] flex items-center justify-center transition-colors"
-                      >
-                        Close
-                      </button>
-                      <button
-                        onClick={toggleModal}
-                        className="hidden sm:flex text-slate-400 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-slate-700 active:bg-slate-600 min-w-[44px] min-h-[44px] items-center justify-center"
-                        aria-label="Close modal"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
+                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-start flex-shrink-0 pr-16">
+                      <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
                     </div>
                     
                     {/* Content (scrollable) - Takes remaining space */}
