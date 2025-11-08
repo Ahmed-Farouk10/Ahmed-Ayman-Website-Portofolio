@@ -70,12 +70,23 @@ function ProjectCard({ project }) {
                 {isOpen && (
                   <div 
                     onClick={toggleModal}
-                    className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
+                    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
+                    style={{
+                      WebkitBackdropFilter: 'blur(12px)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitOverflowScrolling: 'touch',
+                    }}
                   >
                     {/* Modal Content */}
                     <div 
                       onClick={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border-2 border-slate-600 flex flex-col relative"
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full border-2 border-slate-600 flex flex-col relative"
+                      style={{
+                        maxHeight: '90vh',
+                        height: 'auto',
+                        minHeight: 'min(90vh, 600px)',
+                        WebkitOverflowScrolling: 'touch',
+                      }}
                     >
                     {/* Close Button - Top Right Corner */}
                     <button
@@ -92,7 +103,14 @@ function ProjectCard({ project }) {
                     </div>
                     
                     {/* Content (scrollable) - Takes remaining space */}
-                    <div className="overflow-y-auto px-4 sm:px-6 py-4 flex-1 min-h-0" style={{ WebkitOverflowScrolling: 'touch', maxHeight: 'calc(90vh - 200px)' }}>
+                    <div 
+                      className="overflow-y-auto px-4 sm:px-6 py-4 flex-1 min-h-0" 
+                      style={{ 
+                        WebkitOverflowScrolling: 'touch',
+                        overflowY: 'auto',
+                        WebkitTransform: 'translateZ(0)', // Force hardware acceleration for smooth scrolling
+                      }}
+                    >
                       <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
                         {description}
                       </p>
