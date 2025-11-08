@@ -71,30 +71,55 @@ function ProjectCard({ project }) {
                 {/* Modal Overlay */}
                 {isOpen && (
                   <div 
-                    onClick={toggleModal}
-                    onTouchStart={(e) => {
-                      // Close on touch outside modal content
+                    onClick={(e) => {
+                      // Close when clicking the overlay (not the modal content)
                       if (e.target === e.currentTarget) {
                         toggleModal()
                       }
                     }}
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 p-4 touch-manipulation"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    style={{ touchAction: 'manipulation' }}
                   >
                     {/* Modal Content */}
                     <div 
                       onClick={(e) => e.stopPropagation()}
-                      onTouchStart={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border border-slate-700 flex flex-col transform transition-all duration-300 scale-100 opacity-100 touch-manipulation"
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border border-slate-700 flex flex-col"
+                      style={{ touchAction: 'pan-y' }}
                     >
                     {/* Header - Fixed */}
-                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white pr-2">{title}</h2>
+                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0 gap-2">
+                      <h2 className="text-xl sm:text-2xl font-bold text-white flex-1 pr-2">{title}</h2>
+                      {/* Mobile: Text button, Desktop: X icon */}
                       <button
-                        onClick={toggleModal}
-                        className="text-slate-400 hover:text-white active:text-white transition-colors p-2 sm:p-1 rounded-sm hover:bg-slate-700 active:bg-slate-600 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
-                        aria-label="Close modal"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleModal()
+                        }}
+                        onTouchEnd={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          toggleModal()
+                        }}
+                        className="sm:hidden text-blue-400 hover:text-blue-300 active:text-blue-200 font-medium px-4 py-2 rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 min-h-[44px] flex items-center justify-center transition-colors"
+                        style={{ touchAction: 'manipulation' }}
                       >
-                        <X className="w-6 h-6 sm:w-5 sm:h-5" />
+                        Close
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleModal()
+                        }}
+                        onTouchEnd={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          toggleModal()
+                        }}
+                        className="hidden sm:flex text-slate-400 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-slate-700 active:bg-slate-600 min-w-[44px] min-h-[44px] items-center justify-center"
+                        aria-label="Close modal"
+                        style={{ touchAction: 'manipulation' }}
+                      >
+                        <X className="w-5 h-5" />
                       </button>
                     </div>
                     
