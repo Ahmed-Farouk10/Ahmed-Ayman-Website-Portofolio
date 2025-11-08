@@ -80,11 +80,11 @@ function ProjectCard({ project }) {
                     {/* Modal Content */}
                     <div 
                       onClick={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full border-2 border-slate-600 flex flex-col relative"
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full border-2 border-slate-600 flex flex-col relative overflow-hidden"
                       style={{
                         maxHeight: '90vh',
                         height: 'auto',
-                        minHeight: 'min(90vh, 600px)',
+                        minHeight: 'min(90vh, 500px)',
                         WebkitOverflowScrolling: 'touch',
                       }}
                     >
@@ -111,34 +111,36 @@ function ProjectCard({ project }) {
                         WebkitTransform: 'translateZ(0)', // Force hardware acceleration for smooth scrolling
                       }}
                     >
-                      <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                        {description}
-                      </p>
-                      
-                      {imgUrl && (
-                        <div className="my-4 rounded-lg overflow-hidden border border-slate-700">
-                          <Image
-                            src={urlFor(mainImage)?.width(800).height(450).url()}
-                            alt={title || 'Project Image'}
-                            width={800}
-                            height={450}
-                            className="w-full h-auto object-cover"
-                          />
-                        </div>
-                      )}
-                      
-                      {skills && skills.length > 0 && (
-                        <div className="my-4">
-                          <h4 className="text-white font-semibold mb-3">Skills Used</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {skills.map((skill) => (
-                              <span key={skill} className="bg-blue-900/40 text-blue-200 py-1 px-3 rounded-full text-xs font-medium">
-                                {skill}
-                              </span>
-                            ))}
+                      <div className="space-y-4">
+                        <p className="text-slate-300 leading-relaxed whitespace-pre-line break-words">
+                          {description}
+                        </p>
+                        
+                        {imgUrl && (
+                          <div className="my-6 rounded-lg overflow-hidden border border-slate-700">
+                            <Image
+                              src={urlFor(mainImage)?.width(800).height(450).url()}
+                              alt={title || 'Project Image'}
+                              width={800}
+                              height={450}
+                              className="w-full h-auto object-cover"
+                            />
                           </div>
-                        </div>
-                      )}
+                        )}
+                        
+                        {skills && skills.length > 0 && (
+                          <div className="my-6">
+                            <h4 className="text-white font-semibold mb-3">Skills Used</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {skills.map((skill) => (
+                                <span key={skill} className="bg-blue-900/40 text-blue-200 py-1.5 px-3 rounded-full text-xs font-medium whitespace-nowrap">
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Footer - Fixed */}
