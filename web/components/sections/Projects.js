@@ -80,11 +80,10 @@ function ProjectCard({ project }) {
                     {/* Modal Content */}
                     <div 
                       onClick={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full border-2 border-slate-600 flex flex-col relative overflow-hidden"
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full border-2 border-slate-600 flex flex-col relative"
                       style={{
-                        maxHeight: '90vh',
+                        maxHeight: 'calc(100vh - 2rem)',
                         height: 'auto',
-                        minHeight: 'min(90vh, 500px)',
                         WebkitOverflowScrolling: 'touch',
                       }}
                     >
@@ -99,25 +98,26 @@ function ProjectCard({ project }) {
 
                     {/* Header - Fixed */}
                     <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-start flex-shrink-0 pr-16">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white break-words">{title}</h2>
                     </div>
                     
                     {/* Content (scrollable) - Takes remaining space */}
                     <div 
-                      className="overflow-y-auto px-4 sm:px-6 py-4 flex-1 min-h-0" 
+                      className="flex-1 overflow-y-auto px-4 sm:px-6 py-4" 
                       style={{ 
                         WebkitOverflowScrolling: 'touch',
-                        overflowY: 'auto',
-                        WebkitTransform: 'translateZ(0)', // Force hardware acceleration for smooth scrolling
+                        minHeight: 0,
                       }}
                     >
-                      <div className="space-y-4">
-                        <p className="text-slate-300 leading-relaxed whitespace-pre-line break-words">
-                          {description}
-                        </p>
+                      <div className="space-y-6">
+                        <div>
+                          <p className="text-slate-300 leading-relaxed whitespace-pre-wrap break-words">
+                            {description}
+                          </p>
+                        </div>
                         
                         {imgUrl && (
-                          <div className="my-6 rounded-lg overflow-hidden border border-slate-700">
+                          <div className="rounded-lg overflow-hidden border border-slate-700">
                             <Image
                               src={urlFor(mainImage)?.width(800).height(450).url()}
                               alt={title || 'Project Image'}
@@ -129,11 +129,11 @@ function ProjectCard({ project }) {
                         )}
                         
                         {skills && skills.length > 0 && (
-                          <div className="my-6">
+                          <div>
                             <h4 className="text-white font-semibold mb-3">Skills Used</h4>
                             <div className="flex flex-wrap gap-2">
                               {skills.map((skill) => (
-                                <span key={skill} className="bg-blue-900/40 text-blue-200 py-1.5 px-3 rounded-full text-xs font-medium whitespace-nowrap">
+                                <span key={skill} className="bg-blue-900/40 text-blue-200 py-1.5 px-3 rounded-full text-xs font-medium whitespace-nowrap inline-block">
                                   {skill}
                                 </span>
                               ))}
@@ -144,7 +144,7 @@ function ProjectCard({ project }) {
                     </div>
                     
                     {/* Footer - Fixed */}
-                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex flex-col sm:flex-row flex-shrink-0">
+                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex flex-col sm:flex-row flex-shrink-0 mt-auto">
                       {webUrl && (
                         <a
                           href={webUrl}
