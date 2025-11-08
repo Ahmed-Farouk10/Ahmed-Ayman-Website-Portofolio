@@ -26,5 +26,14 @@ export default {
       type: 'array',
       of: [{type: 'string'}], // An array for bullet points
     },
+    {
+      name: 'webUrl',
+      title: 'Website URL',
+      type: 'url',
+      description: 'Optional: Link to the live website/production URL',
+      validation: Rule => Rule.uri({
+        scheme: ['http', 'https']
+      })
+    }
   ],
 }

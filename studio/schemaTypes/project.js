@@ -38,5 +38,14 @@ export default {
       title: 'Live Demo Link',
       type: 'url',
     },
+    {
+      name: 'webUrl',
+      title: 'Website URL',
+      type: 'url',
+      description: 'Optional: Link to the live website/production URL',
+      validation: Rule => Rule.uri({
+        scheme: ['http', 'https']
+      })
+    },
   ],
 }

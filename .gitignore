@@ -83,3 +83,4 @@ node_modules/
 .env.local
 studio/node_modules/
 web/node_modules/
+READMEE.md
