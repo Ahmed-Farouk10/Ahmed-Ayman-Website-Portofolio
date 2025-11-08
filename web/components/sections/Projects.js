@@ -33,12 +33,14 @@ function ProjectCard({ project }) {
 
   useEffect(() => {
     if (isOpen) {
-      // Prevent body scroll on mobile when dialog is open
+      // Prevent body scroll when dialog is open
       const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
       document.body.setAttribute('data-dialog-open', 'true')
       
-      if (triggerRef.current) {
+      // Only auto-scroll on mobile devices
+      const isMobile = window.innerWidth < 768
+      if (isMobile && triggerRef.current) {
         // Small delay to ensure dialog is mounted
         setTimeout(() => {
           const rect = triggerRef.current.getBoundingClientRect()
@@ -105,12 +107,7 @@ function ProjectCard({ project }) {
                 </DialogTrigger>
                 
                 <DialogContent
-                  className="!fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[95vw] max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] max-h-[85vh] sm:max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl sm:rounded-2xl shadow-2xl mx-4 sm:mx-0"
-                  style={{
-                    // Mobile Safari/Chrome fix
-                    WebkitTransform: 'translate(-50%, -50%)',
-                    transform: 'translate(-50%, -50%)',
-                  }}
+                  className="w-[95vw] max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] max-h-[85vh] sm:max-h-[90vh] bg-slate-800 border border-slate-700 p-0 grid grid-rows-[auto_1fr_auto] rounded-2xl sm:rounded-2xl shadow-2xl"
                 >  
                   {/*//Decide the breakpoint you care about (for laptop/desktop tweak lg or xl).
                    Increase the pixel amount to push the dialog lower; decrease to raise it.
