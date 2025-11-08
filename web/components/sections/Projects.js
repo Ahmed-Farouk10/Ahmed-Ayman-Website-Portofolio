@@ -25,24 +25,6 @@ function ProjectCard({ project }) {
   
   const hasLongDescription = description && description.length > maxLength
 
-  useEffect(() => {
-    if (isOpen) {
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = 'hidden'
-      document.body.setAttribute('data-dialog-open', 'true')
-    } else {
-      // Restore body scroll when modal closes
-      document.body.style.overflow = ''
-      document.body.removeAttribute('data-dialog-open')
-    }
-    
-    return () => {
-      // Cleanup on unmount
-      document.body.style.overflow = ''
-      document.body.removeAttribute('data-dialog-open')
-    }
-  }, [isOpen])
-
   return (
     <>
       <div className="bg-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col transform transition-all duration-300 hover:scale-105 hover:shadow-blue-500/20">
