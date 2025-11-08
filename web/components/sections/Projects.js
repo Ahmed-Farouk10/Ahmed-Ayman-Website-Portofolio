@@ -72,21 +72,29 @@ function ProjectCard({ project }) {
                 {isOpen && (
                   <div 
                     onClick={toggleModal}
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 p-4"
+                    onTouchStart={(e) => {
+                      // Close on touch outside modal content
+                      if (e.target === e.currentTarget) {
+                        toggleModal()
+                      }
+                    }}
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 p-4 touch-manipulation"
                   >
                     {/* Modal Content */}
                     <div 
                       onClick={(e) => e.stopPropagation()}
-                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border border-slate-700 flex flex-col transform transition-all duration-300 scale-100 opacity-100"
+                      onTouchStart={(e) => e.stopPropagation()}
+                      className="bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full h-[90vh] max-h-[90vh] border border-slate-700 flex flex-col transform transition-all duration-300 scale-100 opacity-100 touch-manipulation"
                     >
                     {/* Header - Fixed */}
                     <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white pr-2">{title}</h2>
                       <button
                         onClick={toggleModal}
-                        className="text-slate-400 hover:text-white transition-colors p-1 rounded-sm hover:bg-slate-700"
+                        className="text-slate-400 hover:text-white active:text-white transition-colors p-2 sm:p-1 rounded-sm hover:bg-slate-700 active:bg-slate-600 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        aria-label="Close modal"
                       >
-                        <X className="w-5 h-5" />
+                        <X className="w-6 h-6 sm:w-5 sm:h-5" />
                       </button>
                     </div>
                     
