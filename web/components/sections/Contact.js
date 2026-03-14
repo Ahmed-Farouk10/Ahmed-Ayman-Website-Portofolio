@@ -13,6 +13,8 @@ export default function Contact() {
     message: ''
   })
   const [showMessage, setShowMessage] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -21,13 +23,30 @@ export default function Contact() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    setShowMessage(true)
-    setFormData({ name: '', email: '', subject: '', message: '' })
+    setIsSubmitting(true)
+    setErrorMessage('')
 
-    setTimeout(() => setShowMessage(false), 5000)
+    try {
+      const res = await fetch('https://formspree.io/f/xnjgzbzz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (res.ok) {
+        setShowMessage(true)
+        setFormData({ name: '', email: '', subject: '', message: '' })
+        setTimeout(() => setShowMessage(false), 5000)
+      } else {
+        setErrorMessage('Something went wrong. Please try again.')
+      }
+    } catch {
+      setErrorMessage('Network error. Please check your connection.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -86,6 +105,11 @@ export default function Contact() {
             {showMessage && (
               <div className="mb-6 p-4 bg-green-900/30 border border-green-500 text-green-300 rounded-lg">
                 Thank you for your message! I&apos;ll get back to you soon.
+              </div>
+            )}
+            {errorMessage && (
+              <div className="mb-6 p-4 bg-red-900/30 border border-red-500 text-red-300 rounded-lg">
+                {errorMessage}
               </div>
             )}
 
@@ -149,10 +173,11 @@ export default function Contact() {
               <div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2 group"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2 group"
                 >
-                  <span>Send Message</span>
-                  <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+                  {!isSubmitting && <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                 </button>
               </div>
             </form>

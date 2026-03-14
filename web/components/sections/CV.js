@@ -69,7 +69,7 @@ export default function CV() {
 
                 <div className="pt-4">
                   <a
-                    href="/Ahmed_Ayman_CV.pdf"
+                    href="/AhmedAyman_Farouk_Resume.pdf"
                     download
                     className="inline-flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-500/30 w-full sm:w-auto group"
                   >

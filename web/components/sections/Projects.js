@@ -1,33 +1,14 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { urlFor } from '@/sanity/client'
 import { useState, useEffect } from 'react'
 import { useReveal } from '@/hooks/use-reveal'
-import { ExternalLink, Github, X } from 'lucide-react'
 
 // --- This is the ProjectCard component that is actually being used ---
 function ProjectCard({ project }) {
   const { title, description, mainImage, skills, demoLink, githubLink, webUrl } = project;
-  const [isOpen, setIsOpen] = useState(false)
-  
-  const toggleModal = () => {
-    setIsOpen(!isOpen)
-  }
-  
-  // Auto-close modal after 10 seconds on mobile
-  useEffect(() => {
-    if (isOpen && typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 768 // md breakpoint
-      if (isMobile) {
-        const timer = setTimeout(() => {
-          setIsOpen(false)
-        }, 10000) // 10 seconds
-        
-        return () => clearTimeout(timer)
-      }
-    }
-  }, [isOpen])
   
   const imgUrl = mainImage ? urlFor(mainImage)?.width(600).height(400).url() : null
   
@@ -71,112 +52,12 @@ function ProjectCard({ project }) {
           
           <div className="flex flex-col gap-2 mt-auto">
             {hasLongDescription && (
-              <>
-                {/* Trigger Button */}
-                <button
-                  onClick={toggleModal}
-                  className="w-full text-center bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium py-2.5 px-4 rounded-lg transition-colors duration-300 border border-blue-500/30"
-                >
-                  Read More
-                </button>
-
-                {/* Modal Overlay */}
-                <div 
-                  onClick={toggleModal}
-                  className={`fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ${
-                    isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                  }`}
-                >
-                  {/* Modal Content */}
-                  <div 
-                    onClick={(e) => e.stopPropagation()}
-                    className={`bg-slate-800 rounded-2xl shadow-2xl max-w-[95vw] sm:max-w-[90vw] md:max-w-[860px] w-full max-h-[85vh] sm:max-h-[90vh] border border-slate-700 grid grid-rows-[auto_1fr_auto] transform transition-all duration-300 ${
-                      isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-                    }`}
-                  >
-                    {/* Header */}
-                    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-700 flex items-center justify-between">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white pr-2">{title}</h2>
-                      <button
-                        onClick={toggleModal}
-                        className="text-slate-400 hover:text-white active:text-white transition-colors p-3 sm:p-2 rounded-lg hover:bg-slate-700 active:bg-slate-600 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center touch-manipulation"
-                        aria-label="Close modal"
-                      >
-                        <X className="w-6 h-6 sm:w-5 sm:h-5" />
-                      </button>
-                    </div>
-                    
-                    {/* Content (scrollable) */}
-                    <div className="overflow-y-auto px-4 sm:px-6 py-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                      <p className="text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                        {description}
-                      </p>
-                      
-                      {imgUrl && (
-                        <div className="my-4 rounded-lg overflow-hidden border border-slate-700">
-                          <Image
-                            src={urlFor(mainImage)?.width(800).height(450).url()}
-                            alt={title || 'Project Image'}
-                            width={800}
-                            height={450}
-                            className="w-full h-auto object-cover"
-                          />
-                        </div>
-                      )}
-                      
-                      {skills && skills.length > 0 && (
-                        <div className="my-4">
-                          <h4 className="text-white font-semibold mb-3">Skills Used</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {skills.map((skill) => (
-                              <span key={skill} className="bg-blue-900/40 text-blue-200 py-1 px-3 rounded-full text-xs font-medium">
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Footer */}
-                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t border-slate-700 gap-2 sm:gap-3 md:gap-4 w-full flex flex-col sm:flex-row">
-                      {webUrl && (
-                        <a
-                          href={webUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          <span className="text-sm sm:text-base">Visit Website</span>
-                        </a>
-                      )}
-                      {demoLink && (
-                        <a
-                          href={demoLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 min-h-[44px] sm:min-h-0"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          <span className="text-sm sm:text-base">Live Demo</span>
-                        </a>
-                      )}
-                      {githubLink && (
-                        <a
-                          href={githubLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-colors duration-300 min-h-[44px] sm:min-h-0"
-                        >
-                          <Github className="w-4 h-4" />
-                          <span className="text-sm sm:text-base">View Code</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </>
+              <Link
+                href={`/project/${project._id}`}
+                className="w-full text-center bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium py-2.5 px-4 rounded-lg transition-colors duration-300 border border-blue-500/30 block"
+              >
+                Read More
+              </Link>
             )}
             
             {webUrl && (

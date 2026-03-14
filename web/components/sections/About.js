@@ -35,7 +35,7 @@ export default function About() {
           <div className="md:col-span-2 space-y-6">
             <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl space-y-4 text-lg text-gray-300">
               <p>
-                I am a passionate and driven Computer Engineering student at{' '}
+                I am a passionate and driven Artificial Intelligence Engineer graduated from{' '}
                 <span className="text-blue-400 font-semibold">Alamein International University (AIU)</span>,
                 specializing in Artificial Intelligence. My academic and professional journey is focused
                 on the intersection of machine learning, data analysis, and software development.
