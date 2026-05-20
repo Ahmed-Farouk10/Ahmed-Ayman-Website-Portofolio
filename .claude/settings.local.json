@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(tee install.log)",
+      "Bash(tee -a install.log)",
+      "Bash(npm cache *)",
+      "Bash(npx shadcn@latest init -y)",
+      "Bash(tee -a shadcn.log)",
+      "Bash(npm run *)",
+      "Bash(grep -E \"\\\\.\\(js|ts\\)$\")"
+    ]
+  }
+}

@@ -1,133 +1,239 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { urlFor } from '@/sanity/client'
-import { useState, useEffect } from 'react'
-import { useReveal } from '@/hooks/use-reveal'
+import { useState, useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import SplitType from 'split-type'
+import ProjectCard3D from '@/components/ui/ProjectCard3D'
 
-// --- This is the ProjectCard component that is actually being used ---
-function ProjectCard({ project }) {
-  const { title, description, mainImage, skills, demoLink, githubLink, webUrl } = project;
-  
-  const imgUrl = mainImage ? urlFor(mainImage)?.width(600).height(400).url() : null
-  
-  // Truncate description for card preview (150 chars max)
-  const maxLength = 150
-  const truncatedDesc = description && description.length > maxLength 
-    ? description.substring(0, maxLength).trim() + '...'
-    : description
-  
-  const hasLongDescription = description && description.length > maxLength
+gsap.registerPlugin(ScrollTrigger)
 
-  return (
-    <>
-      <div className="bg-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col transform transition-all duration-300 hover:scale-105 hover:shadow-blue-500/20">
-        {imgUrl ? (
-          <Image
-            src={imgUrl}
-            alt={title || 'Project Image'}
-            width={600}
-            height={400}
-            className="w-full h-56 object-cover"
-          />
-        ) : (
-          <div className="w-full h-56 bg-slate-700 flex items-center justify-center text-gray-500">
-             No image
-          </div>
-        )}
-        <div className="p-6 flex flex-col grow">
-          <h3 className="text-2xl font-bold mb-3 text-white">{title}</h3>
-          <p className="text-gray-300 mb-4 line-clamp-4 leading-relaxed whitespace-pre-line">
-            {truncatedDesc}
-          </p>
-          
-          <div className="mb-4 flex flex-wrap gap-2">
-            {skills?.map((skill) => (
-              <span key={skill} className="bg-blue-900/40 text-blue-200 py-1 px-3 rounded-full text-xs font-medium">
-                {skill}
-              </span>
-            ))}
-          </div>
-          
-          <div className="flex flex-col gap-2 mt-auto">
-            {hasLongDescription && (
-              <Link
-                href={`/project/${project._id}`}
-                className="w-full text-center bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium py-2.5 px-4 rounded-lg transition-colors duration-300 border border-blue-500/30 block"
-              >
-                Read More
-              </Link>
-            )}
-            
-            {webUrl && (
-              <a 
-                href={webUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 min-h-[44px] flex items-center justify-center"
-              >
-                Visit Website
-              </a>
-            )}
-            {demoLink && (
-              <a 
-                href={demoLink} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 min-h-[44px] flex items-center justify-center"
-              >
-                Live Demo
-              </a>
-            )}
-            {githubLink && (
-              <a 
-                href={githubLink} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-full text-center bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-5 rounded-lg transition-colors duration-300 min-h-[44px] flex items-center justify-center"
-              >
-                View Code
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-// --- This is your main Projects component ---
+/**
+ * Horizontal pinned scroll slider for showcasing projects.
+ *
+ * The page pins vertically when the user scrolls into this section.
+ * Further scrolling translates project panels horizontally (left).
+ * Each panel heading uses SplitType character-mask staggers for reveal.
+ *
+ * Falls back to a clean responsive grid when prefers-reduced-motion is active.
+ */
 export default function Projects({ projects = [] }) {
   const [mounted, setMounted] = useState(false)
-  const revealRef = useReveal()
+  const [isReducedMotion, setIsReducedMotion] = useState(false)
+  const sectionRef = useRef(null)
+  const sliderRef = useRef(null)
 
   useEffect(() => {
     setMounted(true)
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setIsReducedMotion(mq.matches)
+    const handler = (e) => setIsReducedMotion(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
   }, [])
+
+  // GSAP ScrollTrigger horizontal pin
+  useEffect(() => {
+    if (!mounted || isReducedMotion || !sectionRef.current || !sliderRef.current || projects.length === 0) return
+
+    const ctx = gsap.context(() => {
+      const panels = gsap.utils.toArray('.project-panel')
+      if (panels.length === 0) return
+
+      // Horizontal scroll timeline with dynamic calculations to prevent sticky end dead-space
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          pin: true,
+          scrub: 0.6, // Tighter responsiveness for native scrolling mechanics
+          start: 'top top',
+          end: () => `+=${sliderRef.current.scrollWidth - window.innerWidth}`,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      // Translate dynamically to match precise content bounds on resize
+      tl.to(sliderRef.current, {
+        x: () => -(sliderRef.current.scrollWidth - window.innerWidth),
+        ease: 'none',
+      })
+
+      // SplitType character reveals per panel (plays cleanly on enter instead of scrub glitches)
+      const splitInstances = []
+      panels.forEach((panel) => {
+        const heading = panel.querySelector('.reveal-chars')
+        if (!heading) return
+
+        const split = new SplitType(heading, { types: 'chars' })
+        splitInstances.push(split)
+
+        if (split.chars && split.chars.length > 0) {
+          gsap.set(split.chars, { yPercent: 120, opacity: 0 })
+          gsap.to(split.chars, {
+            yPercent: 0,
+            opacity: 1,
+            stagger: 0.02,
+            duration: 0.5,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: tl,
+              start: 'left 75%',
+              toggleActions: 'play none none reverse',
+            },
+          })
+        }
+      })
+
+      // Staggered fade-in for card content (plays cleanly on enter instead of scrub glitches)
+      panels.forEach((panel) => {
+        const content = panel.querySelector('.panel-content')
+        if (!content) return
+
+        gsap.fromTo(
+          content,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: tl,
+              start: 'left 70%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        )
+      })
+
+      // Cleanup
+      return () => {
+        splitInstances.forEach((s) => s.revert())
+      }
+    }, sectionRef)
+
+    // Schedule recalculations to ensure pixel-perfect scroll lengths after lazy assets load
+    const timer1 = setTimeout(() => ScrollTrigger.refresh(), 500)
+    const timer2 = setTimeout(() => ScrollTrigger.refresh(), 1500)
+
+    return () => {
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+      ctx.revert()
+    }
+  }, [mounted, isReducedMotion, projects])
 
   if (!mounted) return null
 
+  // Reduced-motion fallback: clean responsive card grid
+  if (isReducedMotion) {
+    return (
+      <section id="projects" className="py-32 relative overflow-hidden" aria-label="Projects">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="text-center mb-20">
+            <h2 className="font-clash text-4xl sm:text-5xl lg:text-6xl font-bold text-mercury tracking-tight mb-4">
+              Curated <span className="text-cyan-electric">Projects</span>
+            </h2>
+            <p className="text-mercury-muted max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+              A showcasing of interactive solutions, combining machine learning intelligence with highly refined creative frontend designs.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+            {projects.map((project) => (
+              <div key={project._id} className="transition-transform duration-500 hover:-translate-y-2">
+                <ProjectCard3D project={project} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // Full GSAP horizontal pinned slider
   return (
-    <section id="projects" className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-500/12 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-blue-700/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+    <section
+      id="projects"
+      ref={sectionRef}
+      className="relative overflow-hidden bg-carbon"
+      aria-label="Projects"
+    >
+      {/* Ambient spotlights behind the pinned section */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-1/4 right-10 w-96 h-96 bg-cyan-500/8 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-1/4 left-10 w-96 h-96 bg-blue-700/6 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '2.5s' }} />
       </div>
 
-      <div ref={revealRef} className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="heading-underline text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl text-center mb-12">
-          My{' '}
-          {/* --- TYPO FIX HERE --- */}
-          <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-            Projects
-          </span>
-        </h2>
+      {/* Slider container — panels sit side-by-side, translated horizontally */}
+      <div
+        ref={sliderRef}
+        className="flex items-stretch will-change-transform"
+        style={{ width: 'max-content' }}
+      >
+        {/* Intro panel */}
+        <div className="project-panel flex-shrink-0 w-screen h-screen flex items-center justify-center px-8">
+          <div className="text-center max-w-3xl">
+            <h2 className="reveal-chars font-clash text-5xl sm:text-6xl lg:text-7xl font-bold text-mercury tracking-tight mb-6 overflow-hidden">
+              Curated Projects
+            </h2>
+            <p className="text-mercury-muted text-lg sm:text-xl leading-relaxed max-w-xl mx-auto">
+              Scroll to explore interactive solutions combining machine learning intelligence with refined creative design.
+            </p>
+            {/* Scroll indicator */}
+            <div className="mt-12 flex items-center justify-center gap-3 text-mercury-muted/60">
+              <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-cyan-500/50" />
+              <span className="text-xs uppercase tracking-[0.3em] font-medium">Scroll</span>
+              <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-cyan-500/50" />
+            </div>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {projects.map((project) => (
-            <ProjectCard key={project._id} project={project} />
-          ))}
+        {/* Project panels */}
+        {projects.map((project, i) => (
+          <div
+            key={project._id}
+            className="project-panel flex-shrink-0 w-screen h-screen flex items-center justify-center px-8 sm:px-16"
+          >
+            <div className="panel-content w-full max-w-4xl">
+              {/* Panel number + title */}
+              <div className="mb-8">
+                <span className="text-cyan-electric/40 font-mono text-sm tracking-[0.5em] uppercase mb-3 block">
+                  {String(i + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+                </span>
+                <h3 className="reveal-chars font-clash text-4xl sm:text-5xl lg:text-6xl font-bold text-mercury tracking-tight overflow-hidden">
+                  {project.title}
+                </h3>
+              </div>
+
+              {/* Card */}
+              <div className="max-w-2xl">
+                <ProjectCard3D project={project} />
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Outro panel — CTA */}
+        <div className="project-panel flex-shrink-0 w-screen h-screen flex items-center justify-center px-8">
+          <div className="text-center max-w-2xl">
+            <h3 className="reveal-chars font-clash text-4xl sm:text-5xl font-bold text-mercury tracking-tight mb-6 overflow-hidden">
+              Want to see more?
+            </h3>
+            <p className="text-mercury-muted text-lg mb-10">
+              These projects represent only a fraction of what I build. Let&apos;s connect and create something extraordinary.
+            </p>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-lg shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:from-cyan-400 hover:to-blue-400 transition-all duration-300 focus-ring-halo"
+            >
+              Get in Touch
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </section>

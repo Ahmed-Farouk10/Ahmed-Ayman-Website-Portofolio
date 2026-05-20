@@ -1,73 +1,198 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import SplitType from 'split-type'
+import { Sparkles, Terminal } from 'lucide-react'
+import { Spotlight } from '@/components/ui/spotlight'
+import { TypingAnimation } from '@/components/ui/typing-animation'
+import { ShimmerButton } from '@/components/ui/shimmer-button'
 
 export default function Hero() {
-  const [stars, setStars] = useState([])
+  const [isReducedMotion, setIsReducedMotion] = useState(false)
+  const headingRef = useRef(null)
+  const subtitleRef = useRef(null)
+  const ctaContainerRef = useRef(null)
+  const sparklesRef = useRef(null)
+  const timelineRef = useRef(null)
 
+  // Check for prefers-reduced-motion
   useEffect(() => {
-    const generatedStars = Array.from({ length: 100 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 3,
-    }))
-    setStars(generatedStars)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    setIsReducedMotion(prefersReducedMotion)
+
+    const handleChange = (e) => setIsReducedMotion(e.matches)
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', handleChange)
+    return () => window.matchMedia('(prefers-reduced-motion: reduce)').removeEventListener('change', handleChange)
   }, [])
 
-  return (
-    <section id="home" className="min-h-screen flex items-center justify-center pt-20 px-4 relative overflow-hidden">
-      {stars.map((star) => (
-        <div
-          key={star.id}
-          className="absolute w-1 h-1 bg-white rounded-full opacity-20"
-          style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
-            animation: `twinkle ${Math.random() * 3 + 2}s infinite ease-in-out`,
-            animationDelay: `${star.delay}s`,
-          }}
-        />
-      ))}
+  // GSAP Stagger Animation Timeline
+  useEffect(() => {
+    if (isReducedMotion) {
+      if (headingRef.current) headingRef.current.style.opacity = '1'
+      if (subtitleRef.current) subtitleRef.current.style.opacity = '1'
+      if (ctaContainerRef.current) ctaContainerRef.current.style.opacity = '1'
+      if (sparklesRef.current) sparklesRef.current.style.opacity = '1'
+      return
+    }
 
-      <div className="text-center max-w-4xl z-10 relative hero-card rounded-3xl px-6 sm:px-10 py-10 sm:py-12 mx-4">
-        <div className="mb-8 flex justify-center">
+    // Split text into characters for premium reveal
+    let splitHeading
+    if (headingRef.current) {
+      splitHeading = new SplitType(headingRef.current, {
+        types: 'chars',
+        tagName: 'span',
+      })
+
+      // Add wrapper styling to each character to clip it
+      if (splitHeading.chars) {
+        splitHeading.chars.forEach((char) => {
+          char.style.display = 'inline-block'
+          char.style.transform = 'translateY(110%)'
+          char.style.opacity = '0'
+          char.style.willChange = 'transform, opacity'
+        })
+      }
+    }
+
+    // Create stagger timeline
+    const timeline = gsap.timeline({
+      defaults: { ease: 'power4.out', duration: 1.2 },
+    })
+
+    timeline
+      // Animate sparkles icon
+      .fromTo(
+        sparklesRef.current,
+        { opacity: 0, scale: 0.6, y: -40 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.7)' }
+      )
+      // Stagger char elements
+      .to(
+        splitHeading?.chars || [],
+        {
+          opacity: 1,
+          y: '0%',
+          stagger: 0.03,
+          duration: 1.0,
+          ease: 'power4.out',
+        },
+        '-=0.5'
+      )
+      // Animate subtitle
+      .fromTo(
+        subtitleRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8 },
+        '-=0.6'
+      )
+      // Animate CTA buttons container
+      .fromTo(
+        ctaContainerRef.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.8 },
+        '-=0.4'
+      )
+
+    timelineRef.current = timeline
+
+    return () => {
+      if (timelineRef.current) timelineRef.current.kill()
+      if (splitHeading) splitHeading.revert()
+    }
+  }, [isReducedMotion])
+
+  return (
+    <section
+      id="home"
+      className="relative min-h-[92vh] flex items-center justify-center pt-24 px-4 overflow-hidden"
+    >
+      {/* Premium Aceternity SVG Spotlight */}
+      <Spotlight />
+
+      {/* Floating terminal design details */}
+      <div className="absolute top-12 left-12 opacity-5 hidden lg:flex items-center gap-3 text-cyan-400 font-mono text-xs select-none">
+        <Terminal className="w-5 h-5 animate-pulse" />
+        <span>SYS_INIT: READY_STATE_OK</span>
+      </div>
+
+      {/* Hero Content Card */}
+      <div className="text-center max-w-4xl z-10 relative glass-container rounded-3xl px-6 sm:px-12 py-12 sm:py-16 mx-4 backdrop-blur-md border border-white/5 shadow-2xl shadow-cyan-950/10">
+        {/* Sparkles Icon Container */}
+        <div ref={sparklesRef} className="mb-8 flex justify-center opacity-0">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-blue-600/20 blur-3xl animate-pulse"></div>
-            <Sparkles className="w-20 h-20 text-blue-400 relative z-10 animate-bounce" />
+            <div
+              className={`absolute inset-[-12px] rounded-full bg-cyan-500/10 blur-2xl ${
+                isReducedMotion ? '' : 'animate-pulse'
+              }`}
+            ></div>
+            <div className="relative p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/15">
+              <Sparkles className="w-10 h-10 text-cyan-400" />
+            </div>
           </div>
         </div>
 
-        <h1 className="text-5xl sm:text-7xl lg:text-8xl font-extrabold mb-6 text-white animate-fade-in text-glow-soft tracking-tight">
-          Hi, I&apos;m{' '}
-          <span className="bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400 bg-clip-text text-transparent">
-            Ahmed Ayman
+        {/* Main Heading with Vertical Character Reveal Mask */}
+        <h1
+          ref={headingRef}
+          className="text-4xl sm:text-6xl lg:text-7xl font-black mb-6 text-zinc-100 text-glow-soft tracking-tight uppercase overflow-hidden"
+          style={{ lineHeight: 1.15 }}
+        >
+          I engineer{' '}
+          <span className="bg-gradient-to-r from-cyan-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">
+            intelligence
           </span>
         </h1>
-        <p className="text-xl sm:text-2xl text-slate-300/95 mb-10 max-w-2xl mx-auto animate-fade-in delay-200">
-          An <span className="text-blue-400 font-semibold">AI & Software Engineer</span> specializing in Machine Learning and Full-Stack Web Development. I build intelligent applications and user-friendly experiences.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in delay-300">
-          <a
+
+        {/* Dynamic Interactive Subtitle */}
+        <div
+          ref={subtitleRef}
+          className="text-lg sm:text-2xl text-zinc-300 mb-12 max-w-2xl mx-auto leading-relaxed opacity-0 min-h-[64px]"
+        >
+          Specialized{' '}
+          <TypingAnimation
+            words={['AI & Machine Learning Engineer', 'Software Systems Architect', 'Full-Stack Developer']}
+            className="font-extrabold text-cyan-electric tracking-tight text-glow-soft"
+          />{' '}
+          architecting highly parallel systems, neural networks, and secure, hyper-fluid web monoliths.
+        </div>
+
+        {/* Premium CTA Buttons */}
+        <div
+          ref={ctaContainerRef}
+          className="flex flex-col sm:flex-row justify-center items-center gap-5 opacity-0"
+        >
+          <ShimmerButton
             href="#projects"
-            className="btn-primary-gradient text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-500/30 relative overflow-hidden group"
+            shimmerColor="#00f0ff"
+            className="w-full sm:w-auto"
           >
-            <span className="relative z-10">View My Projects</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-          </a>
-          <a
-            href="mailto:ahmed.aafmms@gmail.com"
-            className="border border-blue-500/40 bg-slate-800/60 hover:bg-slate-800 text-white font-semibold py-4 px-10 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+            <span>Explore Architecture</span>
+          </ShimmerButton>
+          <ShimmerButton
+            href="#contact"
+            shimmerColor="#3b82f6"
+            background="rgba(15, 23, 42, 0.5)"
+            className="w-full sm:w-auto"
           >
-            Email Me
-          </a>
+            <span>Establish Connection</span>
+          </ShimmerButton>
         </div>
       </div>
 
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-blue-500/12 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-700/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      {/* Background Spotlight Effects */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div
+          className={`absolute top-1/4 left-1/4 w-80 h-80 bg-cyan-500/12 rounded-full blur-3xl ${
+            isReducedMotion ? '' : 'animate-pulse'
+          }`}
+        ></div>
+        <div
+          className={`absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-700/10 rounded-full blur-3xl ${
+            isReducedMotion ? '' : 'animate-pulse'
+          }`}
+          style={isReducedMotion ? {} : { animationDelay: '2s' }}
+        ></div>
       </div>
     </section>
   )

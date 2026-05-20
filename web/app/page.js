@@ -5,6 +5,7 @@ import Experience from '@/components/sections/Experience'
 import Projects from '@/components/sections/Projects'
 import CV from '@/components/sections/CV'
 import Contact from '@/components/sections/Contact'
+import HashScrollHandler from '@/components/ui/HashScrollHandler'
 import { client } from '@/sanity/client'
 
 // Define the GROQ queries to fetch all your data
@@ -43,6 +44,7 @@ export default async function Home() {
   return (
     // Add main container with proper styling and spacing
     <main className="pt-20">
+      <HashScrollHandler />
       <Hero />
       <About />
       {/* Pass the fetched data as props to the components */}

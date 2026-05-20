@@ -1,0 +1,406 @@
+
+<h2 class="sr-only">Section-by-section component upgrade guide for Ahmed's portfolio</h2>
+<style>
+* { box-sizing: border-box; }
+.nav-pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 1rem 0 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.25rem; }
+.np { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 99px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+.np.on { background: var(--color-text-primary); color: var(--color-background-primary); border-color: transparent; }
+.section { display: none; }
+.section.active { display: block; }
+.sec-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+.sec-num { width: 28px; height: 28px; border-radius: 50%; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); flex-shrink: 0; }
+.sec-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+.now-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: .75rem 1rem; margin-bottom: 1rem; }
+.now-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--color-text-tertiary); margin: 0 0 4px; }
+.now-text { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+.comp-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+.comp { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: .85rem 1rem; cursor: pointer; }
+.comp:hover { border-color: var(--color-border-primary); }
+.comp-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.comp-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+.lib-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+.lb-ace { background: #EEEDFE; color: #3C3489; }
+.lb-magic { background: #E1F5EE; color: #085041; }
+.lb-shad { background: #E6F1FB; color: #0C447C; }
+.lb-gsap { background: #FAEEDA; color: #633806; }
+.lb-fm { background: #FBEAF0; color: #72243E; }
+.lb-three { background: #FAECE7; color: #712B13; }
+.lb-css { background: #F1EFE8; color: #444441; }
+.lb-other { background: #EAF3DE; color: #27500A; }
+.comp-desc { font-size: 12px; color: var(--color-text-secondary); margin: 0; line-height: 1.55; }
+.comp-code { font-size: 11px; font-family: var(--font-mono); color: var(--color-text-tertiary); margin: 5px 0 0; background: var(--color-background-secondary); padding: 3px 8px; border-radius: 4px; display: inline-block; }
+.divider { height: 0.5px; background: var(--color-border-tertiary); margin: 1rem 0; }
+.global-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.global-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: .85rem 1rem; }
+.gc-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--color-text-tertiary); margin: 0 0 6px; }
+.gc-item { font-size: 12px; color: var(--color-text-secondary); margin: 3px 0; }
+.gc-item strong { color: var(--color-text-primary); font-weight: 500; }
+.priority { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px; display: inline-block; margin-bottom: .5rem; }
+.p-must { background: #FAECE7; color: #712B13; }
+.p-high { background: #FAEEDA; color: #633806; }
+.p-nice { background: #EAF3DE; color: #27500A; }
+button.ask { font-size: 12px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); cursor: pointer; background: transparent; color: var(--color-text-secondary); margin-top: .75rem; }
+button.ask:hover { background: var(--color-background-secondary); }
+</style>
+
+<div class="nav-pills">
+  <button class="np on" data-s="global">Global first</button>
+  <button class="np" data-s="navbar">Navbar</button>
+  <button class="np" data-s="hero">Hero</button>
+  <button class="np" data-s="about">About</button>
+  <button class="np" data-s="skills">Skills</button>
+  <button class="np" data-s="experience">Experience</button>
+  <button class="np" data-s="projects">Projects</button>
+  <button class="np" data-s="contact">Contact</button>
+  <button class="np" data-s="footer">Footer</button>
+</div>
+
+<div id="global" class="section active">
+  <div class="sec-header"><div class="sec-num">0</div><p class="sec-title">Global — install these first, everything else builds on them</p></div>
+  <div class="global-grid">
+    <div class="global-card">
+      <p class="gc-label">Smooth scroll</p>
+      <p class="gc-item"><strong>Lenis</strong> — wrap your layout, instant buttery scroll</p>
+      <p class="gc-item" style="font-family:var(--font-mono); font-size:11px; color:var(--color-text-tertiary);">npm install lenis</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">Animation engine</p>
+      <p class="gc-item"><strong>GSAP + ScrollTrigger</strong> — all scroll-driven reveals</p>
+      <p class="gc-item" style="font-family:var(--font-mono); font-size:11px; color:var(--color-text-tertiary);">npm install gsap</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">React animation</p>
+      <p class="gc-item"><strong>Framer Motion</strong> — page transitions, hover states</p>
+      <p class="gc-item" style="font-family:var(--font-mono); font-size:11px; color:var(--color-text-tertiary);">npm install framer-motion</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">Text splitting</p>
+      <p class="gc-item"><strong>SplitType</strong> — split text into chars for GSAP animation</p>
+      <p class="gc-item" style="font-family:var(--font-mono); font-size:11px; color:var(--color-text-tertiary);">npm install split-type</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">Fonts — replace immediately</p>
+      <p class="gc-item"><strong>Clash Display</strong> for headings (fontshare.com)</p>
+      <p class="gc-item"><strong>Satoshi</strong> for body (fontshare.com)</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">Custom cursor — add globally</p>
+      <p class="gc-item"><strong>DIY with GSAP</strong> — a div that lags behind mouse</p>
+      <p class="gc-item"><strong>Magnetic buttons</strong> — buttons attract to cursor</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">Component base</p>
+      <p class="gc-item"><strong>shadcn/ui</strong> — base components (Button, Input, Form)</p>
+      <p class="gc-item" style="font-family:var(--font-mono); font-size:11px; color:var(--color-text-tertiary);">npx shadcn@latest init</p>
+    </div>
+    <div class="global-card">
+      <p class="gc-label">Visual components</p>
+      <p class="gc-item"><strong>Aceternity UI</strong> — wow-factor animated components</p>
+      <p class="gc-item"><strong>Magic UI</strong> — portfolio-specific animated pieces</p>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Show me the exact Lenis + GSAP setup code for a Next.js portfolio')">Show me setup code ↗</button>
+</div>
+
+<div id="navbar" class="section">
+  <div class="sec-header"><div class="sec-num">1</div><p class="sec-title">Navbar — "AAF" logo + anchor links</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">Plain sticky nav, text logo "AAF", 6 anchor links with no animation. Functional but invisible — exactly what you expect from a template.</p></div>
+  <span class="priority p-must">Must upgrade</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/navigation-menu')">
+      <div class="comp-top"><p class="comp-name">NavigationMenu</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Replace your raw anchor links with this accessible, animated dropdown-ready nav. Use as your structural base, then style with Tailwind.</p>
+      <span class="comp-code">shadcn add navigation-menu</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/sheet')">
+      <div class="comp-top"><p class="comp-name">Sheet</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Slide-in mobile menu drawer that replaces hamburger menus. Slides from the right with a smooth overlay. Replaces your current mobile nav completely.</p>
+      <span class="comp-code">shadcn add sheet</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/animated-shiny-text')">
+      <div class="comp-top"><p class="comp-name">AnimatedShinyText</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Wrap your "AAF" logo in this — a subtle shimmer animation runs across the text continuously. Turns a plain monogram into a living brand mark.</p>
+      <span class="comp-code">npx magicui-cli add animated-shiny-text</span>
+    </div>
+    <div class="comp" onclick="openLink('https://gsap.com/')">
+      <div class="comp-top"><p class="comp-name">Magnetic nav links (DIY with GSAP)</p><span class="lib-badge lb-gsap">GSAP</span></div>
+      <p class="comp-desc">On hover, each nav link subtly moves toward the cursor. 20 lines of GSAP. One of the most noticed details on top-tier sites — juanmora.co does this exactly.</p>
+      <span class="comp-code">gsap.to(link, { x: magnetX, y: magnetY })</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/animated-gradient-text')">
+      <div class="comp-top"><p class="comp-name">Scroll progress bar</p><span class="lib-badge lb-fm">Framer Motion</span></div>
+      <p class="comp-desc">A thin line at the top of the navbar that fills as the user scrolls. useScroll() + useSpring() from Framer Motion. 5 lines of code, huge polish signal.</p>
+      <span class="comp-code">const { scrollYProgress } = useScroll()</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me the complete upgraded Navbar component with shadcn NavigationMenu, Sheet mobile menu, scroll progress bar in Framer Motion, and a magnetic logo using GSAP')">Build me this navbar ↗</button>
+</div>
+
+<div id="hero" class="section">
+  <div class="sec-header"><div class="sec-num">2</div><p class="sec-title">Hero — "Hi, I'm Ahmed Ayman" + 2 buttons</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">Center-aligned h1 "Hi, I'm Ahmed Ayman", a subtitle sentence, and two plain buttons (View Projects, Email Me). No animation, no visual interest. This is the most important section — it defines first impression.</p></div>
+  <span class="priority p-must">Highest priority of the entire site</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/background-beams')">
+      <div class="comp-top"><p class="comp-name">BackgroundBeams</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Animated light beams that converge on a point — creates depth on a dark background without 3D complexity. Replace your plain background with this. Immediate "wow" on load.</p>
+      <span class="comp-code">import { BackgroundBeams } from "@/components/ui/background-beams"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/spotlight')">
+      <div class="comp-top"><p class="comp-name">Spotlight</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">A spotlight that follows the cursor across the hero. Reveals your text dramatically as if a stage light is following your name. Seen on linear.app and dozens of Awwwards sites.</p>
+      <span class="comp-code">import { Spotlight } from "@/components/ui/spotlight"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/text-generate-effect')">
+      <div class="comp-top"><p class="comp-name">TextGenerateEffect</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Your hero headline types itself in on load, word by word, with a blur-in effect. Replace "Hi, I'm Ahmed Ayman" — rewrite the copy to something bold: "I build minds, not just software."</p>
+      <span class="comp-code">import { TextGenerateEffect } from "@/components/ui/text-generate-effect"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/sparkles-text')">
+      <div class="comp-top"><p class="comp-name">SparklesText</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Wrap your name "Ahmed Ayman" in this — tiny gold sparkles randomly animate around specific words. Perfect for highlighting "AI Engineer" in your title.</p>
+      <span class="comp-code">npx magicui-cli add sparkles-text</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/typing-animation')">
+      <div class="comp-top"><p class="comp-name">TypingAnimation</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Your subtitle cycles through "AI Engineer", "Full-Stack Developer", "ML Specialist" with a cursor. Communicates all your roles without crowding the hero. Use under your main headline.</p>
+      <span class="comp-code">npx magicui-cli add typing-animation</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/shimmer-button')">
+      <div class="comp-top"><p class="comp-name">ShimmerButton</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Replace both plain CTA buttons. A shimmer animation moves across the button continuously. For "View My Projects" — make it the primary call. Magnetic GSAP effect on hover.</p>
+      <span class="comp-code">npx magicui-cli add shimmer-button</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/aurora-background')">
+      <div class="comp-top"><p class="comp-name">AuroraBackground (alt option)</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Northern-lights style animated gradient background. Softer and more colorful than BackgroundBeams. Use this if you want a warmer, more "human" feel vs the tech beam look.</p>
+      <span class="comp-code">import { AuroraBackground } from "@/components/ui/aurora-background"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://split-type.vercel.app')">
+      <div class="comp-top"><p class="comp-name">SplitType + GSAP stagger reveal</p><span class="lib-badge lb-gsap">GSAP + SplitType</span></div>
+      <p class="comp-desc">Split your headline into individual characters. On load, each char falls in from below with a stagger. This is the exact technique used on fluid.glass and juanmora.co for their hero text.</p>
+      <span class="comp-code">new SplitType('.hero-title', { types: 'chars' })</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me a complete Hero section component using Aceternity Spotlight + BackgroundBeams + SplitType GSAP text reveal + Magic UI ShimmerButton for my Next.js portfolio')">Build me this hero ↗</button>
+</div>
+
+<div id="about" class="section">
+  <div class="sec-header"><div class="sec-num">3</div><p class="sec-title">About — photo + bio + 3 mini stat cards</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">A circular profile photo on the left, bio paragraph on the right, 3 tiny cards below (AI & ML / Full-Stack / Innovation). Standard two-column layout with no animation or visual character.</p></div>
+  <span class="priority p-high">High priority</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/3d-card-effect')">
+      <div class="comp-top"><p class="comp-name">3D Card Effect (for your photo)</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Wrap your profile photo in this — it tilts in 3D as the user moves their cursor over it. Your flat circle photo becomes a living, responsive portrait. Immediately more premium.</p>
+      <span class="comp-code">import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/bento-grid')">
+      <div class="comp-top"><p class="comp-name">BentoGrid</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Replace the 3 plain mini-cards with a bento grid. Each cell can have different sizes, icons, and hover animations. Your "AI & ML", "Full-Stack", "Innovation" cards become a visual layout statement.</p>
+      <span class="comp-code">npx magicui-cli add bento-grid</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/number-ticker')">
+      <div class="comp-top"><p class="comp-name">NumberTicker</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Add stats to your About section — "5+ Projects", "3 Internships", "2 Years Experience". These numbers count up from 0 when scrolled into view. Turns plain text into a visual proof point.</p>
+      <span class="comp-code">npx magicui-cli add number-ticker</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/animated-beam')">
+      <div class="comp-top"><p class="comp-name">AnimatedBeam</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Animated connection lines between icons — visualize your stack (Python → TensorFlow → Model → App). Perfect in the About section to show how your skills connect rather than just listing them.</p>
+      <span class="comp-code">npx magicui-cli add animated-beam</span>
+    </div>
+    <div class="comp" onclick="openLink('https://motion.dev/docs/react-scroll-animations')">
+      <div class="comp-top"><p class="comp-name">whileInView animations</p><span class="lib-badge lb-fm">Framer Motion</span></div>
+      <p class="comp-desc">Your photo and text slide in from opposite sides when scrolled into view. motion.div with whileInView="visible" + staggered children. The standard technique for professional scroll reveals.</p>
+      <span class="comp-code">{"<"}motion.div whileInView={{ opacity: 1, x: 0 }}{">"}</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me an About section with Aceternity 3D card for my photo, Magic UI BentoGrid for the 3 stat cards, NumberTicker for experience stats, and Framer Motion scroll reveals')">Build me this About ↗</button>
+</div>
+
+<div id="skills" class="section">
+  <div class="sec-header"><div class="sec-num">4</div><p class="sec-title">Skills — grid of skill tags</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">Likely a grid of flat badges or progress bars listing Python, TensorFlow, React, etc. The most generic section on any portfolio — the one recruiters skip the fastest.</p></div>
+  <span class="priority p-high">Transform this completely</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/icon-cloud')">
+      <div class="comp-top"><p class="comp-name">IconCloud</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">A 3D rotating sphere of all your tech icons (Python, React, TensorFlow, Docker, etc.). It auto-rotates and responds to cursor. Transforms a flat skills list into a living, interactive centerpiece.</p>
+      <span class="comp-code">npx magicui-cli add icon-cloud</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/marquee')">
+      <div class="comp-top"><p class="comp-name">Marquee (infinite scroll)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Two infinite rows of skill logos scrolling in opposite directions. Top row scrolls left, bottom right. Seen on major agency sites for client logos — works identically for tech skills.</p>
+      <span class="comp-code">npx magicui-cli add marquee</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/infinite-moving-cards')">
+      <div class="comp-top"><p class="comp-name">InfiniteMovingCards</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Skill cards slide horizontally in an infinite loop with a glowing gradient fade on the edges. Each card shows a skill icon + name + level. More visual than Marquee, adds depth with the glow effect.</p>
+      <span class="comp-code">import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://devicon.dev')">
+      <div class="comp-top"><p class="comp-name">Devicon</p><span class="lib-badge lb-other">Devicon</span></div>
+      <p class="comp-desc">Official SVG icons for every tech brand — Python, TensorFlow, React, Next.js, Docker, all in the correct brand colors. Use these inside your IconCloud or Marquee instead of text badges.</p>
+      <span class="comp-code">npm install devicon / CDN link in layout</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/wavy-background')">
+      <div class="comp-top"><p class="comp-name">WavyBackground (section wrapper)</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Wrap your entire Skills section in an animated wave background. Adds motion to the section container itself — the skills feel like they're floating above a living surface.</p>
+      <span class="comp-code">import { WavyBackground } from "@/components/ui/wavy-background"</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me a Skills section using Magic UI IconCloud with all my tech stack (Python, TensorFlow, React, Next.js, Docker, scikit-learn, Java, PostgreSQL) and a Marquee row below it with Devicon icons')">Build me this Skills section ↗</button>
+</div>
+
+<div id="experience" class="section">
+  <div class="sec-header"><div class="sec-num">5</div><p class="sec-title">Experience — 5-item timeline</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">IEEE, Quantum Intern (Qworld), WTM Data Analysis, ML Intern (Uneeq), Java Intern (ITI) — listed as a plain vertical list with bullets. No visual timeline, no animation, no differentiation by type.</p></div>
+  <span class="priority p-must">Must upgrade — this is your proof</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/timeline')">
+      <div class="comp-top"><p class="comp-name">Timeline</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Aceternity's timeline component is exactly what you need — a vertical line connects each role, entries animate in as you scroll. Each entry can hold icons, date chips, and multi-line content. This is a direct drop-in replacement.</p>
+      <span class="comp-code">import { Timeline } from "@/components/ui/timeline"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/magic-card')">
+      <div class="comp-top"><p class="comp-name">MagicCard (for each timeline entry)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Wrap each experience entry in MagicCard — a spotlight gradient follows the cursor inside each card. Your Quantum Computing internship card lights up when hovered. Extremely high-end feel.</p>
+      <span class="comp-code">npx magicui-cli add magic-card</span>
+    </div>
+    <div class="comp" onclick="openLink('https://gsap.com/docs/v3/Plugins/ScrollTrigger/')">
+      <div class="comp-top"><p class="comp-name">ScrollTrigger stagger reveals</p><span class="lib-badge lb-gsap">GSAP ScrollTrigger</span></div>
+      <p class="comp-desc">Each timeline entry slides up and fades in as it enters the viewport, staggered by 100ms. The connecting line draws itself from top to bottom as you scroll. This is the signature effect on every top portfolio.</p>
+      <span class="comp-code">ScrollTrigger.create({ trigger: entry, animation: tl })</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/badge')">
+      <div class="comp-top"><p class="comp-name">Badge (for skills per role)</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Add skill tags to each experience entry — "Python", "Qiskit", "TensorFlow" under the relevant role. shadcn Badge is perfectly styled, accessible, and consistent with your component system.</p>
+      <span class="comp-code">shadcn add badge</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/collapsible')">
+      <div class="comp-top"><p class="comp-name">Collapsible (for bullet points)</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Show 1 summary line per experience, with a "show more" that expands the bullet points. Keeps the timeline clean while all the detail is there. Prevents the wall-of-text problem on mobile.</p>
+      <span class="comp-code">shadcn add collapsible</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me a complete Experience Timeline section using Aceternity Timeline + MagicCard for each entry + GSAP ScrollTrigger line-draw animation + shadcn Badge for skill tags, with all 5 of my roles populated')">Build me this timeline ↗</button>
+</div>
+
+<div id="projects" class="section">
+  <div class="sec-header"><div class="sec-num">6</div><p class="sec-title">Projects — project cards</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">Standard grid of project cards with title, description, tech tags, and GitHub links. Nothing shows the actual work — no screenshots, no demos, no metrics. Projects are told, not shown.</p></div>
+  <span class="priority p-must">This is your portfolio's main event</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/direction-aware-hover')">
+      <div class="comp-top"><p class="comp-name">DirectionAwareHover</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Project image fills the card. On hover, a description overlay slides in FROM whichever direction the cursor entered — top, left, right, bottom. One of the most impressive hover effects available. Perfect for project thumbnails.</p>
+      <span class="comp-code">import { DirectionAwareHover } from "@/components/ui/direction-aware-hover"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/hover-effect')">
+      <div class="comp-top"><p class="comp-name">HoverEffect (card grid)</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">A grid where cards grow and neighbors shrink when you hover one. Creates a "lens" effect across your project grid. Pass your projects array in and it renders the entire section.</p>
+      <span class="comp-code">import { HoverEffect } from "@/components/ui/card-hover-effect"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/magic-card')">
+      <div class="comp-top"><p class="comp-name">MagicCard (per project)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">The cursor-following spotlight inside each project card makes every card feel interactive and alive. Combine with a screenshot from Shots.so as the card background for maximum impact.</p>
+      <span class="comp-code">npx magicui-cli add magic-card</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/glare-card')">
+      <div class="comp-top"><p class="comp-name">GlareCard</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">A holographic glare moves across the card surface as the cursor moves — like a physical trading card catching light. Best for your most impressive projects (Quantum Computing project would look stunning).</p>
+      <span class="comp-code">import { GlareCard } from "@/components/ui/glare-card"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://shots.so')">
+      <div class="comp-top"><p class="comp-name">Shots.so (project mockups)</p><span class="lib-badge lb-other">Shots.so</span></div>
+      <p class="comp-desc">Take every project screenshot and drop it into Shots.so — choose a device frame and background. This alone makes projects look 10x more professional. Free tier covers all you need.</p>
+      <span class="comp-code">shots.so → upload screenshot → export</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/dialog')">
+      <div class="comp-top"><p class="comp-name">Dialog (project case study)</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Click a project card → a full Dialog opens with expanded case study: problem, your solution, tech used, result with a number ("reduced churn prediction error by 23%"). Don't bury detail in tiny cards.</p>
+      <span class="comp-code">shadcn add dialog</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/tabs')">
+      <div class="comp-top"><p class="comp-name">Tabs (filter by category)</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Add tabs above your projects: "All / AI & ML / Full-Stack / Quantum". Let visitors filter to what they care about. A recruiter for an ML role sees only ML projects instantly.</p>
+      <span class="comp-code">shadcn add tabs</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me a Projects section using Aceternity DirectionAwareHover for project cards + shadcn Tabs to filter by category + shadcn Dialog for expanded case study modal, with example data for my Churn Prediction and Quantum Computing projects')">Build me this Projects section ↗</button>
+</div>
+
+<div id="contact" class="section">
+  <div class="sec-header"><div class="sec-num">7</div><p class="sec-title">Contact — form + contact info</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">A two-column layout: contact info (email, phone, LinkedIn, GitHub) on the left, a plain form (Name, Email, Subject, Message, Send) on the right. The form isn't functional — it's decorative.</p></div>
+  <span class="priority p-high">Make the form actually work + look great</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://ui.aceternity.com/components/background-gradient')">
+      <div class="comp-top"><p class="comp-name">BackgroundGradient (form wrapper)</p><span class="lib-badge lb-ace">Aceternity UI</span></div>
+      <p class="comp-desc">Wraps your entire contact form in an animated gradient border that slowly cycles colors. The form itself stays clean white — only the border animates. Immediately elevates a plain form to a design object.</p>
+      <span class="comp-code">import { BackgroundGradient } from "@/components/ui/background-gradient"</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/form')">
+      <div class="comp-top"><p class="comp-name">Form + Input + Textarea</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">Replace plain HTML inputs with shadcn Form (React Hook Form + Zod validation). Real-time validation errors, accessible labels, proper focus states. The form should actually validate and submit — not just look like it does.</p>
+      <span class="comp-code">shadcn add form input textarea</span>
+    </div>
+    <div class="comp" onclick="openLink('https://resend.com')">
+      <div class="comp-top"><p class="comp-name">Resend (make the form work)</p><span class="lib-badge lb-other">Resend</span></div>
+      <p class="comp-desc">Free email API (3,000 emails/month free). Add a Next.js API route that calls Resend when the form submits. Your contact form actually sends you emails. Non-negotiable — a broken form is worse than no form.</p>
+      <span class="comp-code">npm install resend / app/api/contact/route.ts</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/animated-subscribe-button')">
+      <div class="comp-top"><p class="comp-name">AnimatedSubscribeButton (submit)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Your Send button animates on click — morphs to a checkmark on success. Replace the plain "Send Message" button. Gives immediate visual feedback that the message was sent.</p>
+      <span class="comp-code">npx magicui-cli add animated-subscribe-button</span>
+    </div>
+    <div class="comp" onclick="openLink('https://ui.shadcn.com/docs/components/sonner')">
+      <div class="comp-top"><p class="comp-name">Sonner (toast notifications)</p><span class="lib-badge lb-shad">shadcn/ui</span></div>
+      <p class="comp-desc">After form submission, a toast pops up: "Message sent! I'll reply within 24 hours." shadcn's Sonner is the cleanest toast component available — slides in from the corner, auto-dismisses.</p>
+      <span class="comp-code">shadcn add sonner</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/dock')">
+      <div class="comp-top"><p class="comp-name">Dock (social links)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Your GitHub, LinkedIn, email links as a macOS-style dock — icons magnify on hover. Replace the plain icon links. One of the most satisfying micro-interactions to interact with.</p>
+      <span class="comp-code">npx magicui-cli add dock</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me a Contact section with Aceternity BackgroundGradient wrapper, shadcn Form with React Hook Form + Zod validation, Resend API route, Magic UI Dock for social links, and Sonner toast on success')">Build me this Contact section ↗</button>
+</div>
+
+<div id="footer" class="section">
+  <div class="sec-header"><div class="sec-num">8</div><p class="sec-title">Footer — social links + copyright</p></div>
+  <div class="now-box"><p class="now-label">Currently</p><p class="now-text">Three social icon links (GitHub, LinkedIn, email), copyright text "© 2026 Ahmed Ayman Farouk • Made with ❤ and Next.js", and a one-liner bio. Minimal but completely undesigned.</p></div>
+  <span class="priority p-nice">Nice to have — but fast win</span>
+  <div class="comp-list">
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/marquee')">
+      <div class="comp-top"><p class="comp-name">Marquee (scrolling name)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">A huge "AHMED AYMAN · AHMED AYMAN · AHMED AYMAN ·" marquee scrolling across the footer at 200px font size. Seen on juanmora.co and jackwatkins.co. Transforms a dead footer into a brand statement.</p>
+      <span class="comp-code">npx magicui-cli add marquee</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/globe')">
+      <div class="comp-top"><p class="comp-name">Globe</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">An interactive 3D globe that rotates slowly. Add arc lines connecting Egypt to global tech hubs — shows you're connected globally without saying it. Great footer centerpiece for an AI engineer.</p>
+      <span class="comp-code">npx magicui-cli add globe</span>
+    </div>
+    <div class="comp" onclick="openLink('https://magicui.design/docs/components/ripple')">
+      <div class="comp-top"><p class="comp-name">Ripple (background)</p><span class="lib-badge lb-magic">Magic UI</span></div>
+      <p class="comp-desc">Concentric ripple rings that pulse outward from the center. Use as the footer background behind your name. Creates a subtle heartbeat effect — the site literally pulses at its end.</p>
+      <span class="comp-code">npx magicui-cli add ripple</span>
+    </div>
+  </div>
+  <button class="ask" onclick="sendPrompt('Write me a Footer with a Magic UI Marquee scrolling my name at large size, a Globe showing Egypt connected to global tech cities, and social icon links styled as a dock')">Build me this footer ↗</button>
+</div>
+
+<script>
+  document.querySelectorAll('.np').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.np').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+      b.classList.add('on');
+      document.getElementById(b.dataset.s).classList.add('active');
+    });
+  });
+</script>

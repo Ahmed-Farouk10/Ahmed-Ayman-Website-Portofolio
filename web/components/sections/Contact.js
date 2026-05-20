@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Phone, Linkedin, Github, Send, Heart } from 'lucide-react'
+import { Mail, Phone, Linkedin, Github, Send } from 'lucide-react'
 import { useReveal } from '@/hooks/use-reveal'
+import { BackgroundGradient } from '@/components/ui/background-gradient'
+import { Dock, DockIcon } from '@/components/ui/dock'
+import { toast } from 'sonner'
 
 export default function Contact() {
   const revealRef = useReveal()
@@ -12,9 +15,7 @@ export default function Contact() {
     subject: '',
     message: ''
   })
-  const [showMessage, setShowMessage] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -26,162 +27,193 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setErrorMessage('')
+
+    // Real-time client-side checks
+    if (!formData.name.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
+      toast.error('Please fill out all fields before transmitting.')
+      setIsSubmitting(false)
+      return
+    }
 
     try {
-      const res = await fetch('https://formspree.io/f/xnjgzbzz', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
 
+      const data = await res.json()
+
       if (res.ok) {
-        setShowMessage(true)
+        toast.success('Signal transmitted successfully!', {
+          description: 'Your message has been registered in the development console.'
+        })
         setFormData({ name: '', email: '', subject: '', message: '' })
-        setTimeout(() => setShowMessage(false), 5000)
       } else {
-        setErrorMessage('Something went wrong. Please try again.')
+        toast.error(data.error || 'Transmission failed. Please try again.')
       }
     } catch {
-      setErrorMessage('Network error. Please check your connection.')
+      toast.error('Network error. Failed to establish connection with server.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <section id="contact" className="py-24 bg-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-blue-500/12 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-cyan-400/12 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+    <section id="contact" className="py-24 bg-carbon relative overflow-hidden">
+      {/* Editorial ambient gradients */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-20 right-20 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
       <div ref={revealRef} className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="heading-underline text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl text-center mb-12">
-          Get In{' '}
-          <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-            Touch
-          </span>
+        <h2 className="font-clash text-4xl sm:text-5xl lg:text-6xl font-bold text-mercury text-center mb-4 tracking-tight">
+          Get In <span className="text-cyan-electric">Touch</span>
         </h2>
-        <p className="text-center text-lg text-gray-300 max-w-2xl mx-auto mb-16">
-          I&apos;m currently available for freelance work and open to new opportunities. Feel free to send me a message!
+        <p className="text-center text-md text-mercury-muted max-w-xl mx-auto mb-16 opacity-80 leading-relaxed">
+          I am currently available for freelance systems engineering and open to innovative team collaborations. Reach out to coordinate.
         </p>
 
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-8 sm:p-10 rounded-3xl shadow-2xl">
-          <div className="space-y-6 text-gray-300">
-            <h3 className="text-2xl font-semibold text-white">Contact Information</h3>
-            <p>Fill out the form, or reach out to me directly via email or social media.</p>
+        <div className="max-w-5xl mx-auto">
+          <BackgroundGradient className="bg-carbon-light border border-white/5 p-8 sm:p-12 rounded-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
+              
+              {/* Direct Info Section */}
+              <div className="flex flex-col justify-between space-y-8">
+                <div className="space-y-6">
+                  <h3 className="font-clash text-2xl sm:text-3xl font-bold text-mercury uppercase tracking-tight">
+                    Direct Connections
+                  </h3>
+                  <p className="text-sm text-mercury-muted leading-relaxed max-w-md">
+                    Fill out the automated transmission form, or trigger direct channels via email, phone, or secure networks.
+                  </p>
 
-            <a href="mailto:ahmed.aafmms@gmail.com" className="flex items-center space-x-3 group transition-all hover:translate-x-2">
-              <div className="p-2 bg-blue-900/40 rounded-lg group-hover:bg-blue-800/40 transition-colors">
-                <Mail className="w-6 h-6 text-blue-400" />
-              </div>
-              <span className="group-hover:text-blue-300 transition-colors">ahmed.aafmms@gmail.com</span>
-            </a>
+                  <div className="space-y-4 pt-4">
+                    <a
+                      href="mailto:ahmed.aafmms@gmail.com"
+                      className="flex items-center space-x-3 group focus-ring-halo rounded p-2 border border-white/5 bg-carbon/50 hover:bg-carbon-lighter hover:border-cyan-500/30 transition-all text-mercury hover:text-cyan-electric no-underline"
+                    >
+                      <div className="p-2.5 bg-cyan-500/10 rounded-lg text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+                        <Mail className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-semibold tracking-tight">ahmed.aafmms@gmail.com</span>
+                    </a>
 
-            <a href="tel:+201021297500" className="flex items-center space-x-3 group transition-all hover:translate-x-2">
-              <div className="p-2 bg-blue-900/40 rounded-lg group-hover:bg-blue-800/40 transition-colors">
-                <Phone className="w-6 h-6 text-blue-400" />
-              </div>
-              <span className="group-hover:text-blue-300 transition-colors">+20 102 129 7500</span>
-            </a>
+                    <a
+                      href="tel:+201021297500"
+                      className="flex items-center space-x-3 group focus-ring-halo rounded p-2 border border-white/5 bg-carbon/50 hover:bg-carbon-lighter hover:border-cyan-500/30 transition-all text-mercury hover:text-cyan-electric no-underline"
+                    >
+                      <div className="p-2.5 bg-cyan-500/10 rounded-lg text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+                        <Phone className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-semibold tracking-tight">+20 102 129 7500</span>
+                    </a>
+                  </div>
+                </div>
 
-            <a href="https://www.linkedin.com/in/ahmed-ayman10" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 group transition-all hover:translate-x-2">
-                <div className="p-2 bg-blue-900/40 rounded-lg group-hover:bg-blue-800/40 transition-colors">
-                <Linkedin className="w-6 h-6 text-blue-400" />
+                {/* macOS Magnifying Social Dock */}
+                <div className="pt-8 border-t border-white/5 flex flex-col items-center md:items-start gap-4">
+                  <span className="text-xs font-mono uppercase tracking-widest text-mercury-muted/65">
+                    Authorized Networks
+                  </span>
+                  <Dock className="w-full justify-center md:justify-start">
+                    <DockIcon onClick={() => window.open('https://github.com/Ahmed-Farouk10', '_blank')}>
+                      <Github className="w-5 h-5 text-mercury" />
+                    </DockIcon>
+                    <DockIcon onClick={() => window.open('https://www.linkedin.com/in/ahmed-ayman10', '_blank')}>
+                      <Linkedin className="w-5 h-5 text-cyan-400" />
+                    </DockIcon>
+                    <DockIcon onClick={() => window.location.href = 'mailto:ahmed.aafmms@gmail.com'}>
+                      <Mail className="w-5 h-5 text-blue-400" />
+                    </DockIcon>
+                    <DockIcon onClick={() => window.location.href = 'tel:+201021297500'}>
+                      <Phone className="w-5 h-5 text-emerald-400" />
+                    </DockIcon>
+                  </Dock>
+                </div>
               </div>
-              <span className="group-hover:text-blue-300 transition-colors">LinkedIn Profile</span>
-            </a>
 
-            <a href="https://github.com/Ahmed-Farouk10" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 group transition-all hover:translate-x-2">
-              <div className="p-2 bg-blue-900/40 rounded-lg group-hover:bg-blue-800/40 transition-colors">
-                <Github className="w-6 h-6 text-blue-400" />
-              </div>
-              <span className="group-hover:text-blue-300 transition-colors">GitHub Profile</span>
-            </a>
-          </div>
+              {/* Form Input Fields */}
+              <div className="bg-carbon/40 border border-white/5 rounded-xl p-6 sm:p-8 backdrop-blur-xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-xs font-mono uppercase tracking-wider text-mercury mb-2">
+                      Operator Identity
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="e.g. John Doe"
+                      required
+                      className="w-full bg-carbon-lighter/75 border border-white/8 text-mercury px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all font-satoshi text-sm focus-ring-halo placeholder-white/20"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="email" className="block text-xs font-mono uppercase tracking-wider text-mercury mb-2">
+                      Return Channel (Email)
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="e.g. operator@network.com"
+                      required
+                      className="w-full bg-carbon-lighter/75 border border-white/8 text-mercury px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all font-satoshi text-sm focus-ring-halo placeholder-white/20"
+                    />
+                  </div>
 
-              <div>
-            {showMessage && (
-              <div className="mb-6 p-4 bg-green-900/30 border border-green-500 text-green-300 rounded-lg">
-                Thank you for your message! I&apos;ll get back to you soon.
-              </div>
-            )}
-            {errorMessage && (
-              <div className="mb-6 p-4 bg-red-900/30 border border-red-500 text-red-300 rounded-lg">
-                {errorMessage}
-              </div>
-            )}
+                  <div>
+                    <label htmlFor="subject" className="block text-xs font-mono uppercase tracking-wider text-mercury mb-2">
+                      Transmission Subject
+                    </label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      placeholder="e.g. System Integration Query"
+                      required
+                      className="w-full bg-carbon-lighter/75 border border-white/8 text-mercury px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all font-satoshi text-sm focus-ring-halo placeholder-white/20"
+                    />
+                  </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-slate-700 border border-slate-600 text-white p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                />
+                  <div>
+                    <label htmlFor="message" className="block text-xs font-mono uppercase tracking-wider text-mercury mb-2">
+                      Payload Message
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows="4"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Type your transmission payload here..."
+                      required
+                      className="w-full bg-carbon-lighter/75 border border-white/8 text-mercury px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all font-satoshi text-sm focus-ring-halo placeholder-white/20 resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:from-cyan-600 disabled:to-blue-700 disabled:cursor-not-allowed text-carbon font-bold py-3.5 px-6 rounded-lg text-sm transition-all duration-300 transform active:scale-95 disabled:active:scale-100 shadow-md shadow-cyan-500/10 min-h-[44px] flex items-center justify-center space-x-2 group focus-ring-halo select-none uppercase tracking-wider"
+                  >
+                    <span>{isSubmitting ? 'Transmitting...' : 'Transmit Signal'}</span>
+                    {!isSubmitting && <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform text-carbon" />}
+                  </button>
+                </form>
               </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-slate-700 border border-slate-600 text-white p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                />
-              </div>
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-white mb-2">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-slate-700 border border-slate-600 text-white p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-white mb-2">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="5"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-slate-700 border border-slate-600 text-white p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                />
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2 group"
-                >
-                  <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
-                  {!isSubmitting && <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-                </button>
-              </div>
-            </form>
-          </div>
+
+            </div>
+          </BackgroundGradient>
         </div>
       </div>
     </section>

@@ -12,7 +12,21 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'space-grotesk': ["'Space Grotesk'", '-apple-system', 'BlinkMacSystemFont', "'Segoe UI'", 'Helvetica', 'Arial', 'sans-serif'],
+        'geist-sans': ["'Geist Sans'", '-apple-system', 'BlinkMacSystemFont', "'Segoe UI'", 'Helvetica', 'Arial', 'sans-serif'],
+      },
+      colors: {
+        zinc: {
+          950: '#09090b',
+          900: '#18181b',
+          800: '#27272a',
+          400: '#a1a1aa',
+          100: '#f4f4f5',
+        },
+      },
+    },
   },
   plugins: [],
 }
